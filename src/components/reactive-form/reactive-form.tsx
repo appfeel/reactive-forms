@@ -23,9 +23,16 @@ export class ReactiveForm {
 
     componentDidRender() {
         const ionInputs = this.reactiveEl.querySelectorAll('[data-form-control]');
+        /** Searched 'input' elements to control. Keep in mind to add new exceptions as we did with 'textarea'. */
+        let elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
 
         ionInputs.forEach((ionInput) => {
-            const elmts = ionInput.querySelectorAll('input');
+            elmts = ionInput.querySelectorAll('input');
+
+            if (elmts.length === 0) {
+                elmts = ionInput.querySelectorAll('textarea');
+                console.log(elmts);
+            }
 
             if (elmts.length === 1) {
                 const data = ionInput.getAttribute('data-form-control');
@@ -39,9 +46,9 @@ export class ReactiveForm {
                 input.onreset = this.onreset.bind(this);
 
             } else if (elmts.length === 0) {
-                throw new Error('Error: Debe contener un input');
+                throw new Error('Error: Debe contener un input o textarea');
             } else {
-                throw new Error('Error: No puede contener mas de 1 input');
+                throw new Error('Error: No puede contener mas de 1 input o textarea');
             }
         });
 
