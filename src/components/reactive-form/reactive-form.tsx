@@ -31,7 +31,6 @@ export class ReactiveForm {
 
             if (elmts.length === 0) {
                 elmts = ionInput.querySelectorAll('textarea');
-                console.log(elmts);
             }
 
             if (elmts.length === 1) {
