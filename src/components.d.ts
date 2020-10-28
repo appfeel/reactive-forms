@@ -11,6 +11,8 @@ export namespace Components {
         "formGroup": FormGroup;
         "styleOptions": IStyleOptions;
     }
+    interface TestComponent {
+    }
 }
 declare global {
     interface HTMLReactiveFormElement extends Components.ReactiveForm, HTMLStencilElement {
@@ -19,8 +21,15 @@ declare global {
         prototype: HTMLReactiveFormElement;
         new (): HTMLReactiveFormElement;
     };
+    interface HTMLTestComponentElement extends Components.TestComponent, HTMLStencilElement {
+    }
+    var HTMLTestComponentElement: {
+        prototype: HTMLTestComponentElement;
+        new (): HTMLTestComponentElement;
+    };
     interface HTMLElementTagNameMap {
         "reactive-form": HTMLReactiveFormElement;
+        "test-component": HTMLTestComponentElement;
     }
 }
 declare namespace LocalJSX {
@@ -31,8 +40,11 @@ declare namespace LocalJSX {
         "onValueChanges"?: (event: CustomEvent<any>) => void;
         "styleOptions"?: IStyleOptions;
     }
+    interface TestComponent {
+    }
     interface IntrinsicElements {
         "reactive-form": ReactiveForm;
+        "test-component": TestComponent;
     }
 }
 export { LocalJSX as JSX };
@@ -40,6 +52,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "reactive-form": LocalJSX.ReactiveForm & JSXBase.HTMLAttributes<HTMLReactiveFormElement>;
+            "test-component": LocalJSX.TestComponent & JSXBase.HTMLAttributes<HTMLTestComponentElement>;
         }
     }
 }

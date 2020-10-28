@@ -22,6 +22,19 @@
 | `valueChanges`  |             | `CustomEvent<any>` |
 
 
+## Methods
+
+### `updateElements(formGroup?: any) => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

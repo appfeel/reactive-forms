@@ -22,11 +22,12 @@
     "generate": "stencil generate"
   },
   "dependencies": {
-    "rxjs": "^6.6.3",
-    "@stencil/core": "^2.0.1"
+    "@stencil/core": "^2.0.1",
+    "rxjs": "^6.6.3"
   },
   "license": "MIT",
   "devDependencies": {
+    "@ionic/core": "^5.4.1",
     "tslint": "^6.1.3",
     "tslint-config-airbnb": "^5.11.2",
     "typescript": "^4.0.3"

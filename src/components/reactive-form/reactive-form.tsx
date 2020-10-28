@@ -1,4 +1,5 @@
 import { Component, Host, h, Element, EventEmitter, Event, Prop } from '@stencil/core';
+
 import { FormGroup, ISetFormControlValueOptions } from '../../utils/model';
 
 interface IStyleOptions {
@@ -21,28 +22,29 @@ export class ReactiveForm {
     @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter;
     @Event({ eventName: 'formStatus' }) form: EventEmitter;
 
-    componentDidRender() {
-        const ionInputs = this.reactiveEl.querySelectorAll('[data-form-control]');
+    async componentDidRender() {
+        const dataElements = this.reactiveEl.querySelectorAll('[data-form-control]');
         /** Searched 'input' elements to control. Keep in mind to add new exceptions as we did with 'textarea'. */
         let elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
 
-        ionInputs.forEach((ionInput) => {
-            elmts = ionInput.querySelectorAll('input');
+        dataElements.forEach((htmlElmnt) => {
+            // TODO: no está funcionando
+            const controlName = htmlElmnt.getAttribute('data-form-control');
+            htmlElmnt['onionchange'] = this.onionchange.bind(this);
+
+            elmts = htmlElmnt.querySelectorAll('input');
 
             if (elmts.length === 0) {
-                elmts = ionInput.querySelectorAll('textarea');
+                elmts = htmlElmnt.querySelectorAll('textarea');
             }
 
             if (elmts.length === 1) {
-                const data = ionInput.getAttribute('data-form-control');
-                const input = elmts.item(0);
-
-                input.setAttribute('name', data);
-
-                input.onchange = this.onchange.bind(this);
-                input.oninput = this.oninput.bind(this);
-                input.onfocus = this.onfocus.bind(this);
-                input.onreset = this.onreset.bind(this);
+                const el: any = elmts.item(0);
+                el.setAttribute('name', controlName);
+                el.onchange = this.onchange.bind(this);
+                el.oninput = this.oninput.bind(this);
+                el.onfocus = this.onfocus.bind(this);
+                el.onreset = this.onreset.bind(this);
 
             } else if (elmts.length === 0) {
                 throw new Error('Error: Debe contener un input o textarea');
@@ -62,6 +64,17 @@ export class ReactiveForm {
             emitEvent: false,
             emitModelToViewChange: false,
             emitViewToModelChange: false,
+        });
+    }
+
+    onionchange(ev: any) {
+        // TODO: verificar
+        const { value, name } = ev.target;
+        this.updateInputValue(name, value, {
+            onlySelf: true,
+            emitEvent: true,
+            emitModelToViewChange: true,
+            emitViewToModelChange: true,
         });
     }
 
@@ -103,12 +116,12 @@ export class ReactiveForm {
         this.updateInputEl(name);
 
         this.form.emit(this.formGroup);
+
     }
 
     updateInputEl(name: string) {
         const query = `[data-form-control=${name}]`;
         const el = this.reactiveEl.querySelector(query);
-
 
         if (this.formGroup.controls[name].status === 'VALID') {
             el.classList.remove(this.styleOptions.invalid);
