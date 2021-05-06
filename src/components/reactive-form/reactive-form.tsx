@@ -28,9 +28,8 @@ export class ReactiveForm {
         let elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
 
         dataElements.forEach((htmlElmnt) => {
-            // TODO: no está funcionando
             const controlName = htmlElmnt.getAttribute('data-form-control');
-            htmlElmnt['onionchange'] = this.onionchange.bind(this);
+            htmlElmnt.addEventListener('ionChange', ev => this.onionchange(controlName, ev));
 
             elmts = htmlElmnt.querySelectorAll('input');
 
@@ -41,11 +40,10 @@ export class ReactiveForm {
             if (elmts.length === 1) {
                 const el: any = elmts.item(0);
                 el.setAttribute('name', controlName);
-                el.onchange = this.onchange.bind(this);
-                el.oninput = this.oninput.bind(this);
-                el.onfocus = this.onfocus.bind(this);
-                el.onreset = this.onreset.bind(this);
-
+                el.onchange = ev => this.onchange(controlName, ev);
+                el.oninput = ev => this.oninput(controlName, ev);
+                el.onfocus = () => this.onfocus(controlName);
+                el.onreset = () => this.onreset(controlName);
             } else if (elmts.length === 0) {
                 throw new Error('Error: Debe contener un input o textarea');
             } else {
@@ -57,8 +55,8 @@ export class ReactiveForm {
         this.formGroup.statusChanges.subscribe(value => this.statusChanges.emit(value));
     }
 
-    oninput(ev: any) {
-        const { value, name } = ev.target;
+    oninput(name: string, ev: any) {
+        const { value } = ev.target;
         this.updateInputValue(name, value, {
             onlySelf: true,
             emitEvent: false,
@@ -67,9 +65,8 @@ export class ReactiveForm {
         });
     }
 
-    onionchange(ev: any) {
-        // TODO: verificar
-        const { value, name } = ev.target;
+    onionchange(name: string, ev: any) {
+        const { value } = ev.target;
         this.updateInputValue(name, value, {
             onlySelf: true,
             emitEvent: true,
@@ -78,8 +75,8 @@ export class ReactiveForm {
         });
     }
 
-    onchange(ev: any) {
-        const { value, name } = ev.target;
+    onchange(name: string, ev: any) {
+        const { value } = ev.target;
         this.updateInputValue(name, value, {
             onlySelf: true,
             emitEvent: true,
@@ -88,15 +85,13 @@ export class ReactiveForm {
         });
     }
 
-    onfocus(ev: any) {
-        const { name } = ev.target;
+    onfocus(name: string) {
         if (!this.formGroup.controls[name].touched) {
             this.formGroup.controls[name].markAllAsTouched();
         }
     }
 
-    onreset(ev: any) {
-        const { name } = ev.target;
+    onreset(name: string) {
         this.formGroup.controls[name].reset('', {
             onlySelf: true,
             // TODO: view options
@@ -116,7 +111,6 @@ export class ReactiveForm {
         this.updateInputEl(name);
 
         this.form.emit(this.formGroup);
-
     }
 
     updateInputEl(name: string) {
@@ -126,18 +120,16 @@ export class ReactiveForm {
         if (this.formGroup.controls[name].status === 'VALID') {
             el.classList.remove(this.styleOptions.invalid);
             el.classList.add(this.styleOptions.valid);
-
         } else {
             el.classList.remove(this.styleOptions.valid);
             el.classList.add(this.styleOptions.invalid);
-
         }
     }
 
     render() {
         return (
             <Host>
-                <slot></slot>
+                <slot />
             </Host>
         );
     }
