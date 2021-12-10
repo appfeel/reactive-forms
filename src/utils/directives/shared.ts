@@ -6,6 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+/**
+ * @license
+ * Copyright AppFeel (Bit Genoma Digital Solutions SL) All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/appfeel/reactive-forms/LICENSE
+ */
+
 // import { isDevMode } from '@angular/core';
 
 import { normalizeValidators, Validators } from '../validators';

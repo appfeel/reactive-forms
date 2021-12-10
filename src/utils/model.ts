@@ -540,11 +540,14 @@ export abstract class AbstractControl {
      * * `onlySelf`: When true, mark only this control. When false or not supplied,
      * marks all direct ancestors. Default is false.
      */
-    markAsTouched(opts: { onlySelf?: boolean } = {}): void {
+    markAsTouched(opts: { onlySelf?: boolean, emitEvent?: boolean } = {}): void {
         (this as { touched: boolean }).touched = true;
 
         if (this._parent && !opts.onlySelf) {
-            this._parent.markAsTouched(opts);
+            this._parent.markAsTouched({ ...opts, emitEvent: false });
+        }
+        if (opts.emitEvent) {
+            this.statusChanges.next(this.status);
         }
     }
 
@@ -575,16 +578,20 @@ export abstract class AbstractControl {
      * * `onlySelf`: When true, mark only this control. When false or not supplied,
      * marks all direct ancestors. Default is false.
      */
-    markAsUntouched(opts: { onlySelf?: boolean } = {}): void {
+    markAsUntouched(opts: { onlySelf?: boolean, emitEvent?: boolean } = {}): void {
         (this as { touched: boolean }).touched = false;
         this._pendingTouched = false;
 
         this._forEachChild((control: AbstractControl) => {
-            control.markAsUntouched({ onlySelf: true });
+            control.markAsUntouched({ onlySelf: true, emitEvent: false });
         });
 
         if (this._parent && !opts.onlySelf) {
             this._parent._updateTouched(opts);
+        }
+
+        if (opts.emitEvent) {
+            this.statusChanges.next(this.status);
         }
     }
 
@@ -683,7 +690,6 @@ export abstract class AbstractControl {
         });
         this._updateValue();
 
-        console.log('events', opts.emitEvent);
         // tslint:disable-next-line: no-boolean-literal-compare
         if (opts.emitEvent !== false) {
             this.valueChanges.next(this.value);

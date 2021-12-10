@@ -5,18 +5,27 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+/**
+ * @license
+ * Copyright AppFeel (Bit Genoma Digital Solutions SL) All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/appfeel/reactive-forms/LICENSE
+ */
+
 import { forkJoin, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
 import { AbstractControl } from './model';
 
-function isEmptyInputValue(value: any): boolean {
+export function isEmptyInputValue(value: any): boolean {
     // we don't check for string here so it also works with arrays
     return value == null || value.length === 0;
 }
 
-function hasValidLength(value: any): boolean {
+export function hasValidLength(value: any): boolean {
     // non-strict comparison is intentional, to check for both `null` and `undefined` values
     return value != null && typeof value.length === 'number';
 }

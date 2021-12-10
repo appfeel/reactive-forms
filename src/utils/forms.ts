@@ -7,6 +7,14 @@
  */
 
 /**
+ * @license
+ * Copyright AppFeel (Bit Genoma Digital Solutions SL) All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/appfeel/reactive-forms/LICENSE
+ */
+
+/**
  * @module
  * @description
  * This module is used for handling user input, by defining and building a `FormGroup` that
@@ -24,3 +32,14 @@ export { Validators } from './validators';
 // export {VERSION} from './version';
 
 // export * from './form_providers';
+
+import { Validators } from './validators';
+import { AbstractControl, FormArray, FormControl, FormGroup } from './model';
+import { FormBuilder } from './form_builder';
+
+window['FormBuilder'] = FormBuilder;
+window['Validators'] = Validators;
+window['AbstractControl'] = AbstractControl;
+window['FormArray'] = FormArray;
+window['FormControl'] = FormControl;
+window['FormGroup'] = FormGroup;

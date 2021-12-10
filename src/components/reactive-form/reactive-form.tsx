@@ -1,11 +1,7 @@
-import { Component, Host, h, Element, EventEmitter, Event, Prop } from '@stencil/core';
+import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@stencil/core';
+import { Subscription } from 'rxjs';
 
-import { FormGroup, ISetFormControlValueOptions } from '../../utils/model';
-
-interface IStyleOptions {
-    valid?: string;
-    invalid?: string;
-}
+import { FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
 
 @Component({
     tag: 'reactive-form',
@@ -14,45 +10,134 @@ interface IStyleOptions {
 })
 export class ReactiveForm {
     @Prop() formGroup!: FormGroup;
-    @Prop() styleOptions: IStyleOptions = { invalid: 'invalid', valid: 'valid' };
+    @Prop() attributeName = 'rf-control';
+    @Prop() additionalSelfHosted = [];
 
     @Element() reactiveEl: HTMLElement;
 
     @Event({ eventName: 'valueChanges' }) valueChanges: EventEmitter;
     @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter;
-    @Event({ eventName: 'formStatus' }) form: EventEmitter;
+
+    defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range'];
+    subscriptions: Function[] = [];
 
     async componentDidRender() {
-        const dataElements = this.reactiveEl.querySelectorAll('[data-form-control]');
+        this.defaultSelfHosted = [...this.defaultSelfHosted, ...this.additionalSelfHosted];
+        if (this.formGroup) {
+            this.load();
+        }
+    }
+
+    @Watch('formGroup')
+    onFormGroupChange() {
+        // Remove previous listeners
+        while (this.subscriptions.length) {
+            const unsubscriber = this.subscriptions.pop();
+            unsubscriber();
+        }
+        if (this.formGroup) {
+            this.load();
+        }
+    }
+
+    load() {
+        this.bindInputsTextareas(this.attributeName);
+    }
+
+    bindInputsTextareas(bindingAttr: string) {
         /** Searched 'input' elements to control. Keep in mind to add new exceptions as we did with 'textarea'. */
-        let elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
-
+        const dataElements = this.reactiveEl.querySelectorAll(`[${bindingAttr}]`);
+        const allControlNames = this.formGroup ? Object.keys(this.formGroup.controls) : [];
+        const processed = [];
         dataElements.forEach((htmlElmnt) => {
-            const controlName = htmlElmnt.getAttribute('data-form-control');
-            htmlElmnt.addEventListener('ionChange', ev => this.onionchange(controlName, ev));
-
-            elmts = htmlElmnt.querySelectorAll('input');
-
-            if (elmts.length === 0) {
-                elmts = htmlElmnt.querySelectorAll('textarea');
+            // TODO: custom handlers
+            const controlName = htmlElmnt.getAttribute(bindingAttr);
+            const tagName = htmlElmnt.tagName.toLowerCase();
+            if (!controlName) {
+                console.error(`Control name for element '<${tagName} ${bindingAttr}="">' cannot be empty:`, htmlElmnt);
+                return;
             }
 
-            if (elmts.length === 1) {
-                const el: any = elmts.item(0);
-                el.setAttribute('name', controlName);
-                el.onchange = ev => this.onchange(controlName, ev);
-                el.oninput = ev => this.oninput(controlName, ev);
-                el.onfocus = () => this.onfocus(controlName);
-                el.onreset = () => this.onreset(controlName);
-            } else if (elmts.length === 0) {
-                throw new Error('Error: Debe contener un input o textarea');
-            } else {
-                throw new Error('Error: No puede contener mas de 1 input o textarea');
+            if (processed.indexOf(controlName) >= 0) {
+                console.error(`Duplicate control name '<${tagName} ${bindingAttr}="${controlName}">'`, htmlElmnt);
+                return;
+            }
+
+            processed.push(controlName);
+
+            // Select elements
+            const elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = this.getElements(bindingAttr, controlName);
+
+            if (this.formGroup && allControlNames.indexOf(controlName) < 0) {
+                console.warn(`Missing form control for element '[${bindingAttr}="${controlName}"]'`);
+                this.formGroup.registerControl(controlName, new FormControl());
+                this.formGroup.updateValueAndValidity({ onlySelf: true, emitEvent: true });
+                this.valueChanges.emit(this.formGroup.value);
+            }
+
+            // Bind events
+            const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => this.onionchange(controlName, ev);
+            // Bind ionChange event anyway, so we can handle ion-radio and ion-select properly
+            htmlElmnt.addEventListener('ionChange', onIonChangeEventListener);
+            this.subscriptions.push(() => htmlElmnt.removeEventListener('ionChange', onIonChangeEventListener));
+
+            // Radio buttons can have multiple inputs
+            for (let i = 0; i < elmts.length; i += 1) {
+                const e = elmts.item(i);
+                e.setAttribute('name', controlName);
+                e.onchange = ev => this.onchange(controlName, ev);
+                e.oninput = ev => this.oninput(controlName, ev);
+                e.onfocus = () => this.onfocus(controlName);
+                e.onreset = () => this.onreset(controlName);
+
+                // Assign values
+                let valueChangesSubscr: Subscription;
+                if (this.formGroup?.controls && this.formGroup.controls[controlName]) {
+                    valueChangesSubscr = this.formGroup.controls[controlName].valueChanges.subscribe(() => {
+                        setTimeout(() => {
+                            this.updateHTMLElementValue(controlName, tagName, e);
+                            // Leave time to update formGroup value and status
+                            this.valueChanges.emit(this.formGroup.value);
+                            this.statusChanges.emit(this.formGroup.status);
+                        });
+                    });
+                    this.updateHTMLElementValue(controlName, tagName, e);
+                }
+
+                this.subscriptions.push(() => {
+                    e.onchange = null;
+                    e.oninput = null;
+                    e.onfocus = null;
+                    e.onreset = null;
+                    valueChangesSubscr.unsubscribe();
+                });
             }
         });
+    }
 
-        this.formGroup.valueChanges.subscribe(value => this.valueChanges.emit(value));
-        this.formGroup.statusChanges.subscribe(value => this.statusChanges.emit(value));
+    getElements(bindingAttr: string, controlName: string, htmlElement?: Element) {
+        const htmlElmnt: Element = htmlElement || this.reactiveEl.querySelector(`[${bindingAttr}="${controlName}"]`);
+        const tagName = htmlElmnt.tagName.toLowerCase();
+        const isSelfHosted = htmlElmnt.hasAttribute('rf-self-hosted');
+        let elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
+
+        if (htmlElmnt.tagName.toLowerCase() === 'input' || tagName === 'textarea') {
+            elmts = htmlElmnt.parentElement.querySelectorAll(`[${bindingAttr}="${controlName}"]`);
+        } else {
+            elmts = htmlElmnt.querySelectorAll('input');
+        }
+
+        if (elmts.length === 0) {
+            elmts = htmlElmnt.querySelectorAll('textarea');
+        }
+
+        if (elmts.length === 0 || isSelfHosted || this.defaultSelfHosted.indexOf(tagName) >= 0) {
+            if (elmts.length === 0 && !(isSelfHosted || this.defaultSelfHosted.indexOf(tagName) >= 0)) {
+                console.warn(`Can't find any input or textarea in element '[${bindingAttr}="${controlName}"]'. Taking ${tagName} as the input element.`);
+            }
+            elmts = htmlElmnt.parentElement.querySelectorAll(`[${bindingAttr}="${controlName}"]`);
+        }
+        return elmts;
     }
 
     oninput(name: string, ev: any) {
@@ -66,18 +151,17 @@ export class ReactiveForm {
     }
 
     onionchange(name: string, ev: any) {
-        const { value } = ev.target;
-        this.updateInputValue(name, value, {
-            onlySelf: true,
-            emitEvent: true,
-            emitModelToViewChange: true,
-            emitViewToModelChange: true,
-        });
+        // Checkboxes have checked
+        this.handleOnchange(name, ev.target.value, ev.target.checked);
     }
 
     onchange(name: string, ev: any) {
-        const { value } = ev.target;
-        this.updateInputValue(name, value, {
+        // ev.target on inputs and other controls has also checked
+        this.handleOnchange(name, ev.target.value);
+    }
+
+    handleOnchange(name: string, value: any, checked?: any) {
+        this.updateInputValue(name, checked !== undefined ? checked : value, {
             onlySelf: true,
             emitEvent: true,
             emitModelToViewChange: true,
@@ -86,9 +170,11 @@ export class ReactiveForm {
     }
 
     onfocus(name: string) {
+        this.formGroup.markAsTouched({ emitEvent: true });
         if (!this.formGroup.controls[name].touched) {
             this.formGroup.controls[name].markAllAsTouched();
         }
+        this.statusChanges.emit(this.formGroup.status);
     }
 
     onreset(name: string) {
@@ -97,8 +183,9 @@ export class ReactiveForm {
             // TODO: view options
         });
         if (!this.formGroup.controls[name].touched) {
-            this.formGroup.controls[name].markAllAsTouched();
+            this.formGroup.controls[name].markAsUntouched();
         }
+        this.statusChanges.emit(this.formGroup.status);
     }
 
     updateInputValue(name: string, value: any, options: ISetFormControlValueOptions) {
@@ -110,19 +197,34 @@ export class ReactiveForm {
 
         this.updateInputEl(name);
 
-        this.form.emit(this.formGroup);
+        this.valueChanges.emit(this.formGroup.value);
+        this.statusChanges.emit(this.formGroup.status);
     }
 
     updateInputEl(name: string) {
-        const query = `[data-form-control=${name}]`;
+        const query = `[${this.attributeName}="${name}"]`;
         const el = this.reactiveEl.querySelector(query);
 
-        if (this.formGroup.controls[name].status === 'VALID') {
-            el.classList.remove(this.styleOptions.invalid);
-            el.classList.add(this.styleOptions.valid);
+        if (this.formGroup.controls[name].status === VALID) {
+            el.classList.remove('invalid');
+            el.classList.add('valid');
         } else {
-            el.classList.remove(this.styleOptions.valid);
-            el.classList.add(this.styleOptions.invalid);
+            el.classList.remove('valid');
+            el.classList.add('invalid');
+        }
+    }
+
+    updateHTMLElementValue(controlName: string, tagName: string, e: HTMLInputElement | HTMLTextAreaElement) {
+        if (this.formGroup.controls[controlName]?.value) {
+            // ion inputs will raise onioninput event so it will raise
+            // valueChanges and statusChanges twice instead of once:
+            // once in this.formGroup.controls[controlName].valueChanges.subscribe()
+            // other one in updateInputValue()
+            if (e.type === 'checkbox' || tagName === 'ion-checkbox') {
+                e['checked'] = this.formGroup.controls[controlName].value;
+            } else {
+                e.value = this.formGroup.controls[controlName].value;
+            }
         }
     }
 

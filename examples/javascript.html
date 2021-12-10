@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="module" src="../dist/forms-reactive/forms-reactive.esm.js"></script>
+    <script nomodule src="../dist/forms-reactive/forms-reactive.js"></script>
+    <style>
+        .main-content {
+            display: flex;
+        }
+
+        .control {
+            padding: 20px;
+            border: 1px solid lightseagreen;
+        }
+
+        .rf-wrapper {
+            flex: 1;
+        }
+
+        .form-value-content {
+            position: relative;
+            flex: 1;
+        }
+
+        .form-value-wrapper {
+            position: absolute;
+        }
+
+        #form-value {
+            position: fixed;
+            top: 0;
+            right: 0;
+            border: 1px solid lightblue;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body class="main-content">
+    <div class="rf-wrapper">
+        <reactive-form id="reactiveForm">
+            <div class="control" rf-control="colorInput">
+                <label>Color</label>
+                <input type="color" />
+                <p class="status"></p>
+            </div>
+
+            <div class="control" rf-control="dateInput">
+                <label>Date</label>
+                <input type="date" />
+                <p class="status"></p>
+            </div>
+
+            <div class="control">
+                <label>Date having the rf-control the input itself</label>
+                <input type="date" rf-control="dateInputDeep" />
+            </div>
+
+            <div class="control" rf-control="dateTimeInput">
+                <label>DateTime</label>
+                <input type="datetime" />
+            </div>
+
+            <div class="control" rf-control="dateTimeLocalInput">
+                <label>DateTime Local</label>
+                <input type="datetime-local" />
+            </div>
+
+            <div class="control" rf-control="emailInput">
+                <label>Email</label>
+                <input type="email" />
+            </div>
+
+            <div class="control" rf-control="fileInput">
+                <label>File</label>
+                <input type="file" />
+            </div>
+
+            <div class="control" rf-control="hiddenInput">
+                <label>Hidden</label>
+                <input type="hidden" />
+            </div>
+
+            <div class="control" rf-control="imageInput">
+                <label>Image</label>
+                <input type="image" />
+            </div>
+
+            <div class="control" rf-control="monthInput">
+                <label>Month</label>
+                <input type="month" />
+            </div>
+
+            <div class="control" rf-control="numberInput">
+                <label>Number</label>
+                <input type="number" />
+            </div>
+
+            <div class="control" rf-control="passwordInput">
+                <label>Password</label>
+                <input type="password" />
+            </div>
+
+            <div class="control" rf-control="radioGroup">
+                <p>Select a car:</p>
+                <div>
+                    <input type="radio" id="tesla" value="tesla">
+                    <label for="tesla">Tesla</label>
+                </div>
+                <div>
+                    <input type="radio" id="ford" value="ford">
+                    <label for="ford">Ford</label>
+                </div>
+            </div>
+
+            <div class="control" rf-control="rangeInput">
+                <label>Range</label>
+                <input type="range" />
+            </div>
+
+            <div class="control" rf-control="resetInput">
+                <label>Reset</label>
+                <input type="reset" />
+            </div>
+
+            <div class="control" rf-control="searchInput">
+                <label>Search</label>
+                <input type="search" />
+            </div>
+
+            <div class="control" rf-control="telInput">
+                <label>Tel</label>
+                <input type="tel" />
+            </div>
+
+            <div class="control" rf-control="textInput">
+                <label>Text</label>
+                <input type="text" />
+            </div>
+
+            <div class="control" rf-control="timeInput">
+                <label>Time</label>
+                <input type="time" />
+            </div>
+
+            <div class="control" rf-control="urlInput">
+                <label>Url</label>
+                <input type="url" />
+            </div>
+
+            <div class="control" rf-control="weekInput">
+                <label>Week</label>
+                <input type="week" />
+            </div>
+
+        </reactive-form>
+    </div>
+
+    <div class="form-value-content">
+        <div class="form-value-wrapper">
+            <div id="form-value">
+                <pre id="form-value-content"></pre>
+                <p class="status"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fg;
+        const reactiveForm = document.getElementById('reactiveForm');
+        const formValue = document.getElementById('form-value-content');
+        const formStatus = document.querySelector('.form-value-wrapper .status');
+
+        function refreshControlStatus(target, control) {
+            target.innerHTML = `Valid: ${control.valid ? "yes" : "no"}`;
+            target.innerHTML += `<br/>Invalid: ${control.invalid ? "yes" : "no"}`;
+            target.innerHTML += `<br/>Pristine: ${control.pristine ? "yes" : "no"}`;
+            target.innerHTML += `<br/>Dirty: ${control.dirty ? "yes" : "no"}`;
+        }
+
+        function refreshStatus() {
+            const status = document.querySelectorAll('.status');
+            status.forEach(el => {
+                const controlName = el.parentElement.getAttribute('rf-control');
+                if (controlName === 'form-value-wrapper') {
+                    refreshControlStatus(el, fg);
+                } else if (controlName) {
+                    refreshControlStatus(el, fg.controls[controlName]);
+                }
+            });
+        }
+
+        function refreshValue(value) {
+            formValue.innerHTML = JSON.stringify(value, undefined, 4);
+            refreshStatus();
+        }
+
+        /**
+         * Helper function that will wait until class is available
+         */
+        function whenAvailable(cls, cb) {
+            if (typeof cls === 'string') {
+                cls = [cls];
+            }
+            window.setTimeout(() => cls.every(c => window[c]) ? cb(window[cls]) : whenAvailable(cls, cb), 10);
+        }
+
+        // Need to wait to all components are loaded
+        whenAvailable('FormBuilder', () => {
+            fg = new FormBuilder().group({
+                textInput: ['default text at initializer', Validators.required],
+                radioGroup: ['tesla', Validators.required],
+                colorInput: [],
+
+            });
+            fg.valueChanges.subscribe(v => refreshValue(v));
+            fg.statusChanges.subscribe(v => refreshControlStatus(formStatus, fg));
+            reactiveForm.formGroup = fg;
+            refreshValue(fg.value);
+        });
+    </script>
+</body>
+
+</html>

@@ -6,7 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// import {Injectable} from '@angular/core';
+/**
+ * @license
+ * Copyright AppFeel (Bit Genoma Digital Solutions SL) All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/appfeel/reactive-forms/LICENSE
+ */
+
 
 import { AsyncValidatorFn, ValidatorFn } from './directives/validators';
 import { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup, FormHooks } from './model';
@@ -30,7 +37,6 @@ function isAbstractControlOptions(options: AbstractControlOptions |
  *
  * @publicApi
  */
-// @Injectable()
 export class FormBuilder {
     /**
      * @description
