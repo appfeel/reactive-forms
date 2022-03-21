@@ -40,69 +40,69 @@
 <body class="main-content">
     <div class="rf-wrapper">
         <reactive-form id="reactiveForm">
-            <div class="control" rf-control="colorInput">
+            <div class="control" data-form-control="colorInput">
                 <label>Color</label>
                 <input type="color" />
                 <p class="status"></p>
             </div>
 
-            <div class="control" rf-control="dateInput">
+            <div class="control" data-form-control="dateInput">
                 <label>Date</label>
                 <input type="date" />
                 <p class="status"></p>
             </div>
 
             <div class="control">
-                <label>Date having the rf-control the input itself</label>
-                <input type="date" rf-control="dateInputDeep" />
+                <label>Date having the data-form-control the input itself</label>
+                <input type="date" data-form-control="dateInputDeep" />
             </div>
 
-            <div class="control" rf-control="dateTimeInput">
+            <div class="control" data-form-control="dateTimeInput">
                 <label>DateTime</label>
                 <input type="datetime" />
             </div>
 
-            <div class="control" rf-control="dateTimeLocalInput">
+            <div class="control" data-form-control="dateTimeLocalInput">
                 <label>DateTime Local</label>
                 <input type="datetime-local" />
             </div>
 
-            <div class="control" rf-control="emailInput">
+            <div class="control" data-form-control="emailInput">
                 <label>Email</label>
                 <input type="email" />
             </div>
 
-            <div class="control" rf-control="fileInput">
+            <div class="control" data-form-control="fileInput">
                 <label>File</label>
                 <input type="file" />
             </div>
 
-            <div class="control" rf-control="hiddenInput">
+            <div class="control" data-form-control="hiddenInput">
                 <label>Hidden</label>
                 <input type="hidden" />
             </div>
 
-            <div class="control" rf-control="imageInput">
+            <div class="control" data-form-control="imageInput">
                 <label>Image</label>
                 <input type="image" />
             </div>
 
-            <div class="control" rf-control="monthInput">
+            <div class="control" data-form-control="monthInput">
                 <label>Month</label>
                 <input type="month" />
             </div>
 
-            <div class="control" rf-control="numberInput">
+            <div class="control" data-form-control="numberInput">
                 <label>Number</label>
                 <input type="number" />
             </div>
 
-            <div class="control" rf-control="passwordInput">
+            <div class="control" data-form-control="passwordInput">
                 <label>Password</label>
                 <input type="password" />
             </div>
 
-            <div class="control" rf-control="radioGroup">
+            <div class="control" data-form-control="radioGroup">
                 <p>Select a car:</p>
                 <div>
                     <input type="radio" id="tesla" value="tesla">
@@ -114,42 +114,42 @@
                 </div>
             </div>
 
-            <div class="control" rf-control="rangeInput">
+            <div class="control" data-form-control="rangeInput">
                 <label>Range</label>
                 <input type="range" />
             </div>
 
-            <div class="control" rf-control="resetInput">
+            <div class="control" data-form-control="resetInput">
                 <label>Reset</label>
                 <input type="reset" />
             </div>
 
-            <div class="control" rf-control="searchInput">
+            <div class="control" data-form-control="searchInput">
                 <label>Search</label>
                 <input type="search" />
             </div>
 
-            <div class="control" rf-control="telInput">
+            <div class="control" data-form-control="telInput">
                 <label>Tel</label>
                 <input type="tel" />
             </div>
 
-            <div class="control" rf-control="textInput">
+            <div class="control" data-form-control="textInput">
                 <label>Text</label>
                 <input type="text" />
             </div>
 
-            <div class="control" rf-control="timeInput">
+            <div class="control" data-form-control="timeInput">
                 <label>Time</label>
                 <input type="time" />
             </div>
 
-            <div class="control" rf-control="urlInput">
+            <div class="control" data-form-control="urlInput">
                 <label>Url</label>
                 <input type="url" />
             </div>
 
-            <div class="control" rf-control="weekInput">
+            <div class="control" data-form-control="weekInput">
                 <label>Week</label>
                 <input type="week" />
             </div>
@@ -182,7 +182,7 @@
         function refreshStatus() {
             const status = document.querySelectorAll('.status');
             status.forEach(el => {
-                const controlName = el.parentElement.getAttribute('rf-control');
+                const controlName = el.parentElement.getAttribute('data-form-control');
                 if (controlName === 'form-value-wrapper') {
                     refreshControlStatus(el, fg);
                 } else if (controlName) {

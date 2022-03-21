@@ -10,7 +10,7 @@
 | Property                 | Attribute        | Description | Type        | Default        |
 | ------------------------ | ---------------- | ----------- | ----------- | -------------- |
 | `additionalSelfHosted`   | --               |             | `any[]`     | `[]`           |
-| `attributeName`          | `attribute-name` |             | `string`    | `'rf-control'` |
+| `attributeName`          | `attribute-name` |             | `string`    | `'data-form-control'` |
 | `formGroup` _(required)_ | --               |             | `FormGroup` | `undefined`    |
 
 

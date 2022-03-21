@@ -23,18 +23,18 @@ npm i forms-reactive -S
 
 ## Pure Javascript
 
-Wrap the form controls in a `<reactive-form>` tag. Every control must have the `rf-control` attribute set to the control name on the input itself or in a parent element:
+Wrap the form controls in a `<reactive-form>` tag. Every control must have the `data-form-control` attribute set to the control name on the input itself or in a parent element:
 
 ```html
 <reactive-form id="reactiveForm">
-    <div rf-control="colorInput">
+    <div data-form-control="colorInput">
         <label>Color</label>
         <input type="color" />
     </div>
 
     <div>
         <label>Text</label>
-        <input type="text" rf-control="textInput" />
+        <input type="text" data-form-control="textInput" />
     </div>
 </reactive-form>
 ```
@@ -171,7 +171,7 @@ See javascript example at [examples folder](examples/javascript.html)
 
 <body>
     <reactive-form id="reactiveForm">
-        <div rf-control="textInput">
+        <div data-form-control="textInput">
             <label for="textInput">Text input</label>
             <input type="text" name="textInput" />
         </div>
@@ -265,7 +265,7 @@ export class TestComponent {
         return <reactive-form formGroup={this.formGroup}>
             <ion-item lines="none">
                 <ion-label position="stacked">Empty Text input</ion-label>
-                <ion-input type="text" rf-control="textInputEmpty"></ion-input>
+                <ion-input type="text" data-form-control="textInputEmpty"></ion-input>
                 <ion-note>
                     Errors: {Object.keys(this.formGroup?.controls['textInputEmpty'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInputEmpty'].getError(k)}`)}
                 </ion-note>
@@ -274,7 +274,7 @@ export class TestComponent {
 
             <ion-item lines="none">
                 <ion-label position="stacked">Text input with value on constructor</ion-label>
-                <ion-input type="text" rf-control="textInput"></ion-input>
+                <ion-input type="text" data-form-control="textInput"></ion-input>
                 <ion-note>
                     Errors: {Object.keys(this.formGroup?.controls['textInput'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInput'].getError(k)}`)}
                 </ion-note>
@@ -283,7 +283,7 @@ export class TestComponent {
 
             <ion-item lines="none">
                 <ion-label position="stacked">Text input patched value</ion-label>
-                <ion-input type="text" rf-control="textInputPatched"></ion-input>
+                <ion-input type="text" data-form-control="textInputPatched"></ion-input>
                 <ion-note>
                     Errors: {Object.keys(this.formGroup?.controls['textInputPatched'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInputPatched'].getError(k)}`)}
                 </ion-note>

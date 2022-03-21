@@ -10,7 +10,7 @@ import { FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../.
 })
 export class ReactiveForm {
     @Prop() formGroup!: FormGroup;
-    @Prop() attributeName = 'rf-control';
+    @Prop() attributeName = 'data-form-control';
     @Prop() additionalSelfHosted = [];
 
     @Element() reactiveEl: HTMLElement;
