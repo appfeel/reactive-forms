@@ -7,11 +7,11 @@
 
 ## Properties
 
-| Property                 | Attribute        | Description | Type        | Default        |
-| ------------------------ | ---------------- | ----------- | ----------- | -------------- |
-| `additionalSelfHosted`   | --               |             | `any[]`     | `[]`           |
+| Property                 | Attribute        | Description | Type        | Default               |
+| ------------------------ | ---------------- | ----------- | ----------- | --------------------- |
+| `additionalSelfHosted`   | --               |             | `any[]`     | `[]`                  |
 | `attributeName`          | `attribute-name` |             | `string`    | `'data-form-control'` |
-| `formGroup` _(required)_ | --               |             | `FormGroup` | `undefined`    |
+| `formGroup` _(required)_ | --               |             | `FormGroup` | `undefined`           |
 
 
 ## Events
