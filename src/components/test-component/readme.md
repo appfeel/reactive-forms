@@ -13,20 +13,21 @@
 - ion-chip
 - ion-label
 - ion-spinner
-- [reactive-form](../reactive-form)
 - ion-card
-- ion-card-content
-- ion-icon
 - ion-card-header
 - ion-card-title
 - ion-input
 - ion-select
 - ion-select-option
 - ion-checkbox
+- ion-toggle
 - ion-list
 - ion-radio-group
 - ion-radio
 - ion-range
+- [reactive-form](../reactive-form)
+- ion-card-content
+- ion-icon
 - ion-footer
 - ion-toolbar
 - ion-buttons
@@ -46,20 +47,21 @@ graph TD;
   test-component --> ion-chip
   test-component --> ion-label
   test-component --> ion-spinner
-  test-component --> reactive-form
   test-component --> ion-card
-  test-component --> ion-card-content
-  test-component --> ion-icon
   test-component --> ion-card-header
   test-component --> ion-card-title
   test-component --> ion-input
   test-component --> ion-select
   test-component --> ion-select-option
   test-component --> ion-checkbox
+  test-component --> ion-toggle
   test-component --> ion-list
   test-component --> ion-radio-group
   test-component --> ion-radio
   test-component --> ion-range
+  test-component --> reactive-form
+  test-component --> ion-card-content
+  test-component --> ion-icon
   test-component --> ion-footer
   test-component --> ion-toolbar
   test-component --> ion-buttons
