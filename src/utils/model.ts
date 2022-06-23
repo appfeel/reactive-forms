@@ -1312,7 +1312,7 @@ export class FormControl extends AbstractControl {
     /**
      * @internal
      */
-    _anyControls(condition: Function): boolean {
+    _anyControls(_condition: Function): boolean {
         return false;
     }
 
