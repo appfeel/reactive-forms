@@ -11,6 +11,7 @@
 | ------------------------ | ---------------- | ----------- | ----------- | --------------------- |
 | `additionalSelfHosted`   | --               |             | `any[]`     | `[]`                  |
 | `attributeName`          | `attribute-name` |             | `string`    | `'data-form-control'` |
+| `debounceTime`           | `debounce-time`  |             | `number`    | `0`                   |
 | `formGroup` _(required)_ | --               |             | `FormGroup` | `undefined`           |
 
 

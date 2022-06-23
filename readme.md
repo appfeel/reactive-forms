@@ -88,6 +88,12 @@ In the same way, each time the form is validated or it's status has changed, the
 fg.statusChanges.subscribe(status => console.log(status === 'VALID' ? 'Form is valid' : 'Form is not valid'));
 ```
 
+When used with ionic, two events will be rised every time the value or status changes, one per ionic `ionChange` events and another per javascript `change` events. To avoid this duplicate bouncing, there is an optional parameter which can be configured. The usual value to avoid bouncing in the majority of brosers will be about 100ms, but it depends on many factors like browser, user computer speed, etc.
+
+```html
+<reactive-form debounce-time=100>
+```
+
 ## Status
 
 Each control maintains different status flags:
@@ -296,9 +302,6 @@ export class TestComponent {
 
 # RoadMap
 
-[ ] ion-select
-[ ] ion-radio
-[ ] radio
 [ ] remove test-component compilation at build time
 
 # License

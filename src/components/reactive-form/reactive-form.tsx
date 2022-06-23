@@ -1,5 +1,6 @@
 import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@stencil/core';
 import { Subscription } from 'rxjs';
+import { Debouncer } from '../../utils/debouncer';
 
 import { FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
 
@@ -12,6 +13,7 @@ export class ReactiveForm {
     @Prop() formGroup!: FormGroup;
     @Prop() attributeName = 'data-form-control';
     @Prop() additionalSelfHosted = [];
+    @Prop() debounceTime = 0;
 
     @Element() reactiveEl: HTMLElement;
 
@@ -20,6 +22,9 @@ export class ReactiveForm {
 
     defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range', 'ion-toggle'];
     subscriptions: Function[] = [];
+
+    valueDebouncer = new Debouncer();
+    statusDebouncer = new Debouncer();
 
     async componentDidRender() {
         this.defaultSelfHosted = [...this.defaultSelfHosted, ...this.additionalSelfHosted];
@@ -72,7 +77,11 @@ export class ReactiveForm {
                 console.warn(`Missing form control for element '[${bindingAttr}="${controlName}"]'`);
                 this.formGroup.registerControl(controlName, new FormControl());
                 this.formGroup.updateValueAndValidity({ onlySelf: true, emitEvent: true });
-                this.valueChanges.emit(this.formGroup.value);
+                if (this.debounceTime > 0) {
+                    this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
+                } else {
+                    this.valueChanges.emit(this.formGroup.value);
+                }
             }
 
             // Bind events
@@ -97,8 +106,13 @@ export class ReactiveForm {
                         setTimeout(() => {
                             this.updateHTMLElementValue(controlName, tagName, e);
                             // Leave time to update formGroup value and status
-                            this.valueChanges.emit(this.formGroup.value);
-                            this.statusChanges.emit(this.formGroup.status);
+                            if (this.debounceTime > 0) {
+                                this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
+                                this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+                            } else {
+                                this.valueChanges.emit(this.formGroup.value);
+                                this.statusChanges.emit(this.formGroup.status);
+                            }
                         });
                     });
                     this.updateHTMLElementValue(controlName, tagName, e);
@@ -185,7 +199,11 @@ export class ReactiveForm {
         if (!this.formGroup.controls[name].touched) {
             this.formGroup.controls[name].markAllAsTouched();
         }
-        this.statusChanges.emit(this.formGroup.status);
+        if (this.debounceTime > 0) {
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        } else {
+            this.statusChanges.emit(this.formGroup.status);
+        }
     }
 
     onreset(name: string) {
@@ -196,7 +214,11 @@ export class ReactiveForm {
         if (!this.formGroup.controls[name].touched) {
             this.formGroup.controls[name].markAsUntouched();
         }
-        this.statusChanges.emit(this.formGroup.status);
+        if (this.debounceTime > 0) {
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        } else {
+            this.statusChanges.emit(this.formGroup.status);
+        }
     }
 
     updateInputValue(name: string, value: any, options: ISetFormControlValueOptions) {
@@ -208,8 +230,13 @@ export class ReactiveForm {
 
         this.updateInputEl(name);
 
-        this.valueChanges.emit(this.formGroup.value);
-        this.statusChanges.emit(this.formGroup.status);
+        if (this.debounceTime > 0) {
+            this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        } else {
+            this.valueChanges.emit(this.formGroup.value);
+            this.statusChanges.emit(this.formGroup.status);
+        }
     }
 
     updateInputEl(name: string) {

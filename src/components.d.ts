@@ -10,6 +10,7 @@ export namespace Components {
     interface ReactiveForm {
         "additionalSelfHosted": any[];
         "attributeName": string;
+        "debounceTime": number;
         "formGroup": FormGroup;
     }
     interface TestComponent {
@@ -41,6 +42,7 @@ declare namespace LocalJSX {
     interface ReactiveForm {
         "additionalSelfHosted"?: any[];
         "attributeName"?: string;
+        "debounceTime"?: number;
         "formGroup": FormGroup;
         "onStatusChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
         "onValueChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
