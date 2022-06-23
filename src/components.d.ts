@@ -15,6 +15,10 @@ export namespace Components {
     interface TestComponent {
     }
 }
+export interface ReactiveFormCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLReactiveFormElement;
+}
 declare global {
     interface HTMLReactiveFormElement extends Components.ReactiveForm, HTMLStencilElement {
     }
@@ -38,8 +42,8 @@ declare namespace LocalJSX {
         "additionalSelfHosted"?: any[];
         "attributeName"?: string;
         "formGroup": FormGroup;
-        "onStatusChanges"?: (event: CustomEvent<any>) => void;
-        "onValueChanges"?: (event: CustomEvent<any>) => void;
+        "onStatusChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
+        "onValueChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
     }
     interface TestComponent {
     }
