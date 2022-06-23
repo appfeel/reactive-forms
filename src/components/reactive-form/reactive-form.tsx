@@ -158,7 +158,6 @@ export class ReactiveForm {
         if (ev.target.type === 'number') {
             value = parseFloat(value);
         }
-        console.log(value);
         // Checkboxes have checked
         this.handleOnchange(name, value, ev.target.checked);
     }
