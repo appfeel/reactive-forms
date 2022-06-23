@@ -23,6 +23,9 @@ export class TestComponent {
             textInputEmpty: ['', [Validators.required, Validators.email]],
             textInput: ['default text at initializer', [Validators.required, Validators.minLength(30)]],
             textInputPatched: ['', [Validators.required, Validators.maxLength(5)]],
+            numericInputEmpty: [null, [Validators.required, Validators.email]],
+            numericInput: [10, [Validators.required, Validators.minLength(30)]],
+            numericInputPatched: [null, [Validators.required, Validators.maxLength(5)]],
             selectPickerInputEmpty: ['', null, this.asyncValidator('Option 3')],
             selectPickerInput: ['Option 2', Validators.required],
             selectPickerInputPatched: ['', Validators.required],
@@ -30,6 +33,10 @@ export class TestComponent {
             checkboxFalse: [false, Validators.requiredTrue],
             checkbox: [true],
             checkboxPatched: [''],
+            toggleEmpty: [null, Validators.required],
+            toggleFalse: [false, Validators.requiredTrue],
+            toggle: [true],
+            togglePatched: [null],
             radioEmpty: [''],
             radio: ['tesla'],
             radioPatched: [''],
@@ -45,8 +52,10 @@ export class TestComponent {
         setTimeout(() => {
             this.formGroup.patchValue({
                 textInputPatched: 'patched value',
+                numericInputPatched: 20,
                 selectPickerInputPatched: 'Option 3',
                 checkboxPatched: true,
+                togglePatched: true,
                 radioPatched: 'tesla',
                 rangePatched: 30,
                 rangeDualPatched: { lower: 6, upper: 12 },
@@ -133,25 +142,8 @@ export class TestComponent {
         </ion-item>;
     }
 
-    renderForm() {
-        return <reactive-form
-            formGroup={this.formGroup}
-            attributeName="rf-ctrl"
-            onValueChanges={value => this.handleValueChanges(value)}
-            onStatusChanges={state => this.handleStatusChanges(state)}>
-
-            <ion-card>
-                <ion-card-content>
-                    <ion-item lines="none">
-                        <ion-label class="ion-text-wrap">
-                            Reactive form allows to bind a json to a collection of controls.
-                            In this example we simulate a timeout of 2 seconds to patch values on the form.
-                        </ion-label>
-                        {this.isLoading ? <ion-spinner name="circular" slot="end"></ion-spinner> : <ion-icon name="checkmark-outline" slot="end"></ion-icon>}
-                    </ion-item>
-                </ion-card-content>
-            </ion-card>
-
+    renderTextInput() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Email empty value</ion-card-title>
@@ -162,7 +154,6 @@ export class TestComponent {
                 {this.renderChips('textInputEmpty')}
                 {this.renderErrors('textInputEmpty')}
             </ion-card>
-
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Text input default value</ion-card-title>
@@ -204,7 +195,48 @@ export class TestComponent {
                     <ion-input type="text" rf-ctrl=""></ion-input>
                 </ion-item>
             </ion-card>
+        </span>;
+    }
 
+    renderNumericInput() {
+        return <span>
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Numeric input default value</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-input type="number" rf-ctrl="numericInput"></ion-input>
+                </ion-item>
+                {this.renderChips('numericInput')}
+                {this.renderErrors('numericInput')}
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Numeric input patched value</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-input type="number" rf-ctrl="numericInputPatched"></ion-input>
+                </ion-item>
+                {this.renderChips('numericInputPatched')}
+                {this.renderErrors('numericInputPatched')}
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Numeric input missing control in form group</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-input type="number" rf-ctrl="numericInputMissingControl"></ion-input>
+                </ion-item>
+                {this.renderChips('numericInputMissingControl')}
+                {this.renderErrors('numericInputMissingControl')}
+            </ion-card>
+        </span>;
+    }
+
+    renderSelect() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Select empty value, async validators</ion-card-title>
@@ -246,7 +278,11 @@ export class TestComponent {
                 {this.renderChips('selectPickerInputPatched')}
                 {this.renderErrors('selectPickerInputPatched')}
             </ion-card>
+        </span>;
+    }
 
+    renderCheckbox() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Checkbox empty value, required to be changed</ion-card-title>
@@ -294,7 +330,63 @@ export class TestComponent {
                 {this.renderChips('checkboxPatched')}
                 {this.renderErrors('checkboxPatched')}
             </ion-card>
+        </span>;
+    }
 
+    renderToggle() {
+        return <span>
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Toggle empty value, required to be changed</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-label>Toggle</ion-label>
+                    <ion-toggle rf-ctrl="toggleEmpty" slot="start"></ion-toggle>
+                </ion-item>
+                {this.renderChips('toggleEmpty')}
+                {this.renderErrors('toggleEmpty')}
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Toggle default value (False), required True</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-label>Toggle</ion-label>
+                    <ion-toggle rf-ctrl="toggleFalse" slot="start"></ion-toggle>
+                </ion-item>
+                {this.renderChips('toggleFalse')}
+                {this.renderErrors('toggleFalse')}
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Toggle default value (True)</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-label>Toggle</ion-label>
+                    <ion-toggle rf-ctrl="toggle" slot="start"></ion-toggle>
+                </ion-item>
+                {this.renderChips('toggle')}
+                {this.renderErrors('toggle')}
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Toggle patched value</ion-card-title>
+                </ion-card-header>
+                <ion-item lines="full">
+                    <ion-label>Toggle</ion-label>
+                    <ion-toggle rf-ctrl="togglePatched" slot="start"></ion-toggle>
+                </ion-item>
+                {this.renderChips('togglePatched')}
+                {this.renderErrors('togglePatched')}
+            </ion-card>
+        </span>;
+    }
+
+    renderRadio() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Radio empty value</ion-card-title>
@@ -354,7 +446,11 @@ export class TestComponent {
                     {this.renderErrors('radioPatched')}
                 </ion-list>
             </ion-card>
+        </span>;
+    }
 
+    renderRange() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Range empty value</ion-card-title>
@@ -381,7 +477,11 @@ export class TestComponent {
                 {this.renderChips('rangePatched')}
                 {this.renderErrors('rangePatched')}
             </ion-card>
+        </span>;
+    }
 
+    renderRangeDual() {
+        return <span>
             <ion-card>
                 <ion-card-header>
                     <ion-card-title>Range Dual empty value</ion-card-title>
@@ -408,6 +508,37 @@ export class TestComponent {
                 {this.renderChips('rangeDualPatched')}
                 {this.renderErrors('rangeDualPatched')}
             </ion-card>
+        </span>;
+    }
+
+    renderForm() {
+        return <reactive-form
+            formGroup={this.formGroup}
+            attributeName="rf-ctrl"
+            onValueChanges={value => this.handleValueChanges(value)}
+            onStatusChanges={state => this.handleStatusChanges(state)}>
+
+            <ion-card>
+                <ion-card-content>
+                    <ion-item lines="none">
+                        <ion-label class="ion-text-wrap">
+                            Reactive form allows to bind a json to a collection of controls.
+                            In this example we simulate a timeout of 2 seconds to patch values on the form.
+                        </ion-label>
+                        {this.isLoading ? <ion-spinner name="circular" slot="end"></ion-spinner> : <ion-icon name="checkmark-outline" slot="end"></ion-icon>}
+                    </ion-item>
+                </ion-card-content>
+            </ion-card>
+
+            {this.renderTextInput()}
+            {this.renderNumericInput()}
+            {this.renderSelect()}
+            {this.renderCheckbox()}
+            {this.renderToggle()}
+            {this.renderRadio()}
+            {this.renderRange()}
+            {this.renderRangeDual()}
+
         </reactive-form>;
     }
 
@@ -421,7 +552,9 @@ export class TestComponent {
                 <p>Dirty is triggered by patched values.</p>
                 <p>{this.renderChips(this.formGroup)}</p>
                 {this.isValidating ? <ion-item lines="none">Running async validators &nbsp;<ion-spinner name="dots"></ion-spinner></ion-item> : null}
-                <pre>{JSON.stringify(this.printedForm, undefined, 4)}</pre>
+                <div class="scrollable">
+                    <pre>{JSON.stringify(this.printedForm, undefined, 4)}</pre>
+                </div>
             </ion-card-content>
             <ion-footer>
                 <ion-toolbar>

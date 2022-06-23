@@ -18,7 +18,7 @@ export class ReactiveForm {
     @Event({ eventName: 'valueChanges' }) valueChanges: EventEmitter;
     @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter;
 
-    defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range'];
+    defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range', 'ion-toggle'];
     subscriptions: Function[] = [];
 
     async componentDidRender() {
@@ -141,7 +141,10 @@ export class ReactiveForm {
     }
 
     oninput(name: string, ev: any) {
-        const { value } = ev.target;
+        let { value } = ev.target;
+        if (ev.target.type === 'number') {
+            value = parseFloat(value);
+        }
         this.updateInputValue(name, value, {
             onlySelf: true,
             emitEvent: false,
@@ -151,13 +154,22 @@ export class ReactiveForm {
     }
 
     onionchange(name: string, ev: any) {
+        let { value } = ev.target;
+        if (ev.target.type === 'number') {
+            value = parseFloat(value);
+        }
+        console.log(value);
         // Checkboxes have checked
-        this.handleOnchange(name, ev.target.value, ev.target.checked);
+        this.handleOnchange(name, value, ev.target.checked);
     }
 
     onchange(name: string, ev: any) {
+        let { value } = ev.target;
+        if (ev.target.type === 'number') {
+            value = parseFloat(value);
+        }
         // ev.target on inputs and other controls has also checked
-        this.handleOnchange(name, ev.target.value);
+        this.handleOnchange(name, value);
     }
 
     handleOnchange(name: string, value: any, checked?: any) {
@@ -220,7 +232,7 @@ export class ReactiveForm {
             // valueChanges and statusChanges twice instead of once:
             // once in this.formGroup.controls[controlName].valueChanges.subscribe()
             // other one in updateInputValue()
-            if (e.type === 'checkbox' || tagName === 'ion-checkbox') {
+            if (e.type === 'checkbox' || tagName === 'ion-checkbox' || e.type === 'toggle' || tagName === 'ion-toggle') {
                 e['checked'] = this.formGroup.controls[controlName].value;
             } else {
                 e.value = this.formGroup.controls[controlName].value;
