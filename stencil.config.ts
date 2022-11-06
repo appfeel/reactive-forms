@@ -12,7 +12,7 @@ if (process.argv.indexOf('--dist') > -1) {
         esmLoaderPath: '../loader',
     },
     {
-        type: 'dist-custom-elements-bundle',
+        type: 'dist-custom-elements',
     }];
 }
 
