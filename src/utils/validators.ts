@@ -205,6 +205,7 @@ export class Validators {
             return null;  // don't validate empty values to allow optional controls
         }
         // tslint:disable-next-line: object-literal-key-quotes
+        EMAIL_REGEXP.lastIndex = 0;
         return EMAIL_REGEXP.test(control.value) ? null : { 'email': true };
     }
 
@@ -320,7 +321,9 @@ export class Validators {
      *
      */
     static pattern(pattern: string | RegExp): ValidatorFn {
-        if (!pattern) return Validators.nullValidator;
+        if (!pattern) {
+            return Validators.nullValidator;
+        }
         let regex: RegExp;
         let regexStr: string;
         if (typeof pattern === 'string') {
@@ -342,6 +345,7 @@ export class Validators {
                 return null;  // don't validate empty values to allow optional controls
             }
             const value: string = control.value;
+            regex.lastIndex = 0; // Reset regex!!
             return regex.test(value) ? null :
                 { pattern: { requiredPattern: regexStr, actualValue: value } };
         };
