@@ -7,12 +7,12 @@
 
 ## Properties
 
-| Property                 | Attribute        | Description | Type        | Default               |
-| ------------------------ | ---------------- | ----------- | ----------- | --------------------- |
-| `additionalSelfHosted`   | --               |             | `any[]`     | `[]`                  |
-| `attributeName`          | `attribute-name` |             | `string`    | `'data-form-control'` |
-| `debounceTime`           | `debounce-time`  |             | `number`    | `0`                   |
-| `formGroup` _(required)_ | --               |             | `FormGroup` | `undefined`           |
+| Property                     | Attribute             | Description | Type        | Default               |
+| ---------------------------- | --------------------- | ----------- | ----------- | --------------------- |
+| `dataAdditionalSelfHosted`   | --                    |             | `any[]`     | `[]`                  |
+| `dataAttributeName`          | `data-attribute-name` |             | `string`    | `'data-form-control'` |
+| `dataDebounceTime`           | `data-debounce-time`  |             | `number`    | `0`                   |
+| `dataFormGroup` _(required)_ | --                    |             | `FormGroup` | `undefined`           |
 
 
 ## Events

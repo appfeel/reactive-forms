@@ -8,10 +8,10 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { FormGroup } from "./utils/model";
 export namespace Components {
     interface ReactiveForm {
-        "additionalSelfHosted": any[];
-        "attributeName": string;
-        "debounceTime": number;
-        "formGroup": FormGroup;
+        "dataAdditionalSelfHosted": any[];
+        "dataAttributeName": string;
+        "dataDebounceTime": number;
+        "dataFormGroup": FormGroup;
     }
     interface TestComponent {
     }
@@ -40,10 +40,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface ReactiveForm {
-        "additionalSelfHosted"?: any[];
-        "attributeName"?: string;
-        "debounceTime"?: number;
-        "formGroup": FormGroup;
+        "dataAdditionalSelfHosted"?: any[];
+        "dataAttributeName"?: string;
+        "dataDebounceTime"?: number;
+        "dataFormGroup": FormGroup;
         "onStatusChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
         "onValueChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
     }

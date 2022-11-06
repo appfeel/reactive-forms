@@ -216,7 +216,7 @@
             });
             fg.valueChanges.subscribe(v => refreshValue(v));
             fg.statusChanges.subscribe(v => refreshControlStatus(formStatus, fg));
-            reactiveForm.formGroup = fg;
+            reactiveForm.dataFormGroup = fg;
             refreshValue(fg.value);
         });
     </script>

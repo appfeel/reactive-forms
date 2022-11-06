@@ -10,10 +10,10 @@ import { FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../.
     shadow: true,
 })
 export class ReactiveForm {
-    @Prop() formGroup!: FormGroup;
-    @Prop() attributeName = 'data-form-control';
-    @Prop() additionalSelfHosted = [];
-    @Prop() debounceTime = 0;
+    @Prop() dataFormGroup!: FormGroup;
+    @Prop() dataAttributeName = 'data-form-control';
+    @Prop() dataAdditionalSelfHosted = [];
+    @Prop() dataDebounceTime = 0;
 
     @Element() reactiveEl: HTMLElement;
 
@@ -27,32 +27,32 @@ export class ReactiveForm {
     statusDebouncer = new Debouncer();
 
     async componentDidRender() {
-        this.defaultSelfHosted = [...this.defaultSelfHosted, ...this.additionalSelfHosted];
-        if (this.formGroup) {
+        this.defaultSelfHosted = [...this.defaultSelfHosted, ...this.dataAdditionalSelfHosted];
+        if (this.dataFormGroup) {
             this.load();
         }
     }
 
-    @Watch('formGroup')
+    @Watch('dataFormGroup')
     onFormGroupChange() {
         // Remove previous listeners
         while (this.subscriptions.length) {
             const unsubscriber = this.subscriptions.pop();
             unsubscriber();
         }
-        if (this.formGroup) {
+        if (this.dataFormGroup) {
             this.load();
         }
     }
 
     load() {
-        this.bindInputsTextareas(this.attributeName);
+        this.bindInputsTextareas(this.dataAttributeName);
     }
 
     bindInputsTextareas(bindingAttr: string) {
         /** Searched 'input' elements to control. Keep in mind to add new exceptions as we did with 'textarea'. */
         const dataElements = this.reactiveEl.querySelectorAll(`[${bindingAttr}]`);
-        const allControlNames = this.formGroup ? Object.keys(this.formGroup.controls) : [];
+        const allControlNames = this.dataFormGroup ? Object.keys(this.dataFormGroup.controls) : [];
         const processed = [];
         dataElements.forEach((htmlElmnt) => {
             // TODO: custom handlers
@@ -73,14 +73,14 @@ export class ReactiveForm {
             // Select elements
             const elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = this.getElements(bindingAttr, controlName);
 
-            if (this.formGroup && allControlNames.indexOf(controlName) < 0) {
+            if (this.dataFormGroup && allControlNames.indexOf(controlName) < 0) {
                 console.warn(`Missing form control for element '[${bindingAttr}="${controlName}"]'`);
-                this.formGroup.registerControl(controlName, new FormControl());
-                this.formGroup.updateValueAndValidity({ onlySelf: true, emitEvent: true });
-                if (this.debounceTime > 0) {
-                    this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
+                this.dataFormGroup.registerControl(controlName, new FormControl());
+                this.dataFormGroup.updateValueAndValidity({ onlySelf: true, emitEvent: true });
+                if (this.dataDebounceTime > 0) {
+                    this.valueDebouncer.debounce(() => this.valueChanges.emit(this.dataFormGroup.value), this.dataDebounceTime);
                 } else {
-                    this.valueChanges.emit(this.formGroup.value);
+                    this.valueChanges.emit(this.dataFormGroup.value);
                 }
             }
 
@@ -101,17 +101,17 @@ export class ReactiveForm {
 
                 // Assign values
                 let valueChangesSubscr: Subscription;
-                if (this.formGroup?.controls && this.formGroup.controls[controlName]) {
-                    valueChangesSubscr = this.formGroup.controls[controlName].valueChanges.subscribe(() => {
+                if (this.dataFormGroup?.controls && this.dataFormGroup.controls[controlName]) {
+                    valueChangesSubscr = this.dataFormGroup.controls[controlName].valueChanges.subscribe(() => {
                         setTimeout(() => {
                             this.updateHTMLElementValue(controlName, tagName, e);
-                            // Leave time to update formGroup value and status
-                            if (this.debounceTime > 0) {
-                                this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
-                                this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+                            // Leave time to update dataFormGroup value and status
+                            if (this.dataDebounceTime > 0) {
+                                this.valueDebouncer.debounce(() => this.valueChanges.emit(this.dataFormGroup.value), this.dataDebounceTime);
+                                this.statusDebouncer.debounce(() => this.statusChanges.emit(this.dataFormGroup.status), this.dataDebounceTime);
                             } else {
-                                this.valueChanges.emit(this.formGroup.value);
-                                this.statusChanges.emit(this.formGroup.status);
+                                this.valueChanges.emit(this.dataFormGroup.value);
+                                this.statusChanges.emit(this.dataFormGroup.status);
                             }
                         });
                     });
@@ -195,55 +195,55 @@ export class ReactiveForm {
     }
 
     onfocus(name: string) {
-        this.formGroup.markAsTouched({ emitEvent: true });
-        if (!this.formGroup.controls[name].touched) {
-            this.formGroup.controls[name].markAllAsTouched();
+        this.dataFormGroup.markAsTouched({ emitEvent: true });
+        if (!this.dataFormGroup.controls[name].touched) {
+            this.dataFormGroup.controls[name].markAllAsTouched();
         }
-        if (this.debounceTime > 0) {
-            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        if (this.dataDebounceTime > 0) {
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.dataFormGroup.status), this.dataDebounceTime);
         } else {
-            this.statusChanges.emit(this.formGroup.status);
+            this.statusChanges.emit(this.dataFormGroup.status);
         }
     }
 
     onreset(name: string) {
-        this.formGroup.controls[name].reset('', {
+        this.dataFormGroup.controls[name].reset('', {
             onlySelf: true,
             // TODO: view options
         });
-        if (!this.formGroup.controls[name].touched) {
-            this.formGroup.controls[name].markAsUntouched();
+        if (!this.dataFormGroup.controls[name].touched) {
+            this.dataFormGroup.controls[name].markAsUntouched();
         }
-        if (this.debounceTime > 0) {
-            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        if (this.dataDebounceTime > 0) {
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.dataFormGroup.status), this.dataDebounceTime);
         } else {
-            this.statusChanges.emit(this.formGroup.status);
+            this.statusChanges.emit(this.dataFormGroup.status);
         }
     }
 
     updateInputValue(name: string, value: any, options: ISetFormControlValueOptions) {
-        if (!this.formGroup.controls[name].dirty) {
-            this.formGroup.controls[name].markAsDirty();
+        if (!this.dataFormGroup.controls[name].dirty) {
+            this.dataFormGroup.controls[name].markAsDirty();
         }
-        this.formGroup.controls[name].setValue(value, options);
-        this.formGroup.updateValueAndValidity();
+        this.dataFormGroup.controls[name].setValue(value, options);
+        this.dataFormGroup.updateValueAndValidity();
 
         this.updateInputEl(name);
 
-        if (this.debounceTime > 0) {
-            this.valueDebouncer.debounce(() => this.valueChanges.emit(this.formGroup.value), this.debounceTime);
-            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.formGroup.status), this.debounceTime);
+        if (this.dataDebounceTime > 0) {
+            this.valueDebouncer.debounce(() => this.valueChanges.emit(this.dataFormGroup.value), this.dataDebounceTime);
+            this.statusDebouncer.debounce(() => this.statusChanges.emit(this.dataFormGroup.status), this.dataDebounceTime);
         } else {
-            this.valueChanges.emit(this.formGroup.value);
-            this.statusChanges.emit(this.formGroup.status);
+            this.valueChanges.emit(this.dataFormGroup.value);
+            this.statusChanges.emit(this.dataFormGroup.status);
         }
     }
 
     updateInputEl(name: string) {
-        const query = `[${this.attributeName}="${name}"]`;
+        const query = `[${this.dataAttributeName}="${name}"]`;
         const el = this.reactiveEl.querySelector(query);
 
-        if (this.formGroup.controls[name].status === VALID) {
+        if (this.dataFormGroup.controls[name].status === VALID) {
             el.classList.remove('invalid');
             el.classList.add('valid');
         } else {
@@ -253,15 +253,15 @@ export class ReactiveForm {
     }
 
     updateHTMLElementValue(controlName: string, tagName: string, e: HTMLInputElement | HTMLTextAreaElement) {
-        if (this.formGroup.controls[controlName]?.value) {
+        if (this.dataFormGroup.controls[controlName]?.value) {
             // ion inputs will raise onioninput event so it will raise
             // valueChanges and statusChanges twice instead of once:
-            // once in this.formGroup.controls[controlName].valueChanges.subscribe()
+            // once in this.dataFormGroup.controls[controlName].valueChanges.subscribe()
             // other one in updateInputValue()
             if (e.type === 'checkbox' || tagName === 'ion-checkbox' || e.type === 'toggle' || tagName === 'ion-toggle') {
-                e['checked'] = this.formGroup.controls[controlName].value;
+                e['checked'] = this.dataFormGroup.controls[controlName].value;
             } else {
-                e.value = this.formGroup.controls[controlName].value;
+                e.value = this.dataFormGroup.controls[controlName].value;
             }
         }
     }

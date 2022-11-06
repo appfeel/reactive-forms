@@ -42,7 +42,7 @@ Wrap the form controls in a `<reactive-form>` tag. Every control must have the `
 It is also possible to change the attribute name:
 
 ```html
-<reactive-form id="reactiveForm" attribute-name="rf-ctrl">
+<reactive-form id="reactiveForm" data-attribute-name="rf-ctrl">
     <label>Text</label>
     <input type="text" rf-ctrl="textInput" />
 </reactive-form>
@@ -58,7 +58,7 @@ function bindForm() {
         textInput: ['default text at initializer', Validators.required],
     });
     fg.valueChanges.subscribe(v => console.log(v));
-    reactiveForm.formGroup = fg;
+    reactiveForm.dataFormGroup = fg;
 }
 
 // As the script is being load asyncronous, wait for FormGroup to be available
@@ -88,10 +88,22 @@ In the same way, each time the form is validated or it's status has changed, the
 fg.statusChanges.subscribe(status => console.log(status === 'VALID' ? 'Form is valid' : 'Form is not valid'));
 ```
 
-When used with ionic, two events will be rised every time the value or status changes, one per ionic `ionChange` events and another per javascript `change` events. To avoid this duplicate bouncing, there is an optional parameter which can be configured. The usual value to avoid bouncing in the majority of brosers will be about 100ms, but it depends on many factors like browser, user computer speed, etc.
+When used with ionic, two events will be rised every time the value or status changes, one per ionic `ionChange` events and another per javascript `change` events. To avoid this duplicate bouncing, there is an optional `data-debounce-time` attribute which can be configured. The usual value to avoid bouncing in the majority of brosers will be about 100ms, but it depends on many factors like browser, user computer speed, etc.
+
+It only applies to `onValueChanges` and `onStatusChanges` properties.
 
 ```html
-<reactive-form debounce-time=100>
+<reactive-form data-debounce-time=1500>
+```
+
+Subscriptions events will be thrown immedaitely without debouncing:
+
+```js
+const fg = new FormBuilder().group({
+    textInput: ['default text at initializer', Validators.required],
+});
+fg.valueChanges.subscribe(v => console.log(v));
+fg.valueChanges.subscribe(v => console.log(v));
 ```
 
 ## Status
@@ -209,7 +221,7 @@ See javascript example at [examples folder](examples/javascript.html)
                 textInput: ['default text at initializer', Validators.required],
             });
             fg.valueChanges.subscribe(v => updateLive(v));
-            reactiveForm.formGroup = fg;
+            reactiveForm.dataFormGroup = fg;
             updateLive(fg.value);
         });
     </script>
@@ -230,17 +242,17 @@ import { FormBuilder, FormGroup, Validators } from 'forms-reactive';
     styleUrl: 'test-component.css',
 })
 export class TestComponent {
-    formGroup: FormGroup;
+    dataFormGroup: FormGroup;
     subscription;
 
     componentWillLoad() {
-        this.formGroup = new FormBuilder().group({
+        this.dataFormGroup = new FormBuilder().group({
             textInputEmpty: ['', Validators.required],
             textInput: ['default text at initializer', Validators.required],
             textInputPatched: ['', Validators.required],
         });
-        this.formGroup.patchValue({ textInputPatched: 'patched value', selectPickerInputPatched: 'Option 3' });
-        this.subscription = this.formGroup.valueChanges.subscribe(value => console.log(value));
+        this.dataFormGroup.patchValue({ textInputPatched: 'patched value', selectPickerInputPatched: 'Option 3' });
+        this.subscription = this.dataFormGroup.valueChanges.subscribe(value => console.log(value));
     }
 
     disconnectedCallback() {
@@ -268,33 +280,33 @@ export class TestComponent {
     }
 
     render() {
-        return <reactive-form formGroup={this.formGroup}>
+        return <reactive-form dataFormGroup={this.dataFormGroup}>
             <ion-item lines="none">
                 <ion-label position="stacked">Empty Text input</ion-label>
                 <ion-input type="text" data-form-control="textInputEmpty"></ion-input>
                 <ion-note>
-                    Errors: {Object.keys(this.formGroup?.controls['textInputEmpty'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInputEmpty'].getError(k)}`)}
+                    Errors: {Object.keys(this.dataFormGroup?.controls['textInputEmpty'].errors || { none: true }).map(k => `${k}: ${this.dataFormGroup?.controls['textInputEmpty'].getError(k)}`)}
                 </ion-note>
             </ion-item>
-            <ion-item lines="full">{this.renderChips(this.formGroup?.controls['textInputEmpty'])}</ion-item>
+            <ion-item lines="full">{this.renderChips(this.dataFormGroup?.controls['textInputEmpty'])}</ion-item>
 
             <ion-item lines="none">
                 <ion-label position="stacked">Text input with value on constructor</ion-label>
                 <ion-input type="text" data-form-control="textInput"></ion-input>
                 <ion-note>
-                    Errors: {Object.keys(this.formGroup?.controls['textInput'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInput'].getError(k)}`)}
+                    Errors: {Object.keys(this.dataFormGroup?.controls['textInput'].errors || { none: true }).map(k => `${k}: ${this.dataFormGroup?.controls['textInput'].getError(k)}`)}
                 </ion-note>
             </ion-item>
-            <ion-item lines="full">{this.renderChips(this.formGroup?.controls['textInput'])}</ion-item>
+            <ion-item lines="full">{this.renderChips(this.dataFormGroup?.controls['textInput'])}</ion-item>
 
             <ion-item lines="none">
                 <ion-label position="stacked">Text input patched value</ion-label>
                 <ion-input type="text" data-form-control="textInputPatched"></ion-input>
                 <ion-note>
-                    Errors: {Object.keys(this.formGroup?.controls['textInputPatched'].errors || { none: true }).map(k => `${k}: ${this.formGroup?.controls['textInputPatched'].getError(k)}`)}
+                    Errors: {Object.keys(this.dataFormGroup?.controls['textInputPatched'].errors || { none: true }).map(k => `${k}: ${this.dataFormGroup?.controls['textInputPatched'].getError(k)}`)}
                 </ion-note>
             </ion-item>
-            <ion-item lines="full">{this.renderChips(this.formGroup?.controls['textInputPatched'])}</ion-item>
+            <ion-item lines="full">{this.renderChips(this.dataFormGroup?.controls['textInputPatched'])}</ion-item>
         </reactive-form>;
     }
 }
@@ -302,7 +314,9 @@ export class TestComponent {
 
 # RoadMap
 
+[ ] remove rxjs dependency
 [ ] remove test-component compilation at build time
+[ ] test/verify validators behaviour
 
 # License
 

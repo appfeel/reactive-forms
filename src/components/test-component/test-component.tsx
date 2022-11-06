@@ -13,6 +13,7 @@ export class TestComponent {
     @State() isValidating = false;
     @State() forceUpdate = 0;
     @State() isLoading = false;
+    @State() debounceTime = 100;
     formGroup: FormGroup;
     options: string[] = [];
     subscriptions: Subscription[] = [];
@@ -64,7 +65,7 @@ export class TestComponent {
         }, 1000);
         this.printedForm = { ...this.formGroup.value };
 
-        // We can subscribe or we can use reactive-form events
+        // We can subscribe or we can use reactive-form events. They are not affected by debounceTime
         // this.subscriptions.push(this.formGroup.valueChanges.subscribe(value => this.handleValueChanges(value)));
         // this.subscriptions.push(this.formGroup.statusChanges.subscribe(state => this.handleStatusChanges(state)));
     }
@@ -513,10 +514,11 @@ export class TestComponent {
 
     renderForm() {
         return <reactive-form
-            formGroup={this.formGroup}
-            attributeName="rf-ctrl"
+            dataFormGroup={this.formGroup}
+            dataAttributeName="rf-ctrl"
             onValueChanges={value => this.handleValueChanges(value)}
-            onStatusChanges={state => this.handleStatusChanges(state)}>
+            onStatusChanges={state => this.handleStatusChanges(state)}
+            dataDebounceTime={this.debounceTime}>
 
             <ion-card>
                 <ion-card-content>
@@ -526,6 +528,15 @@ export class TestComponent {
                             In this example we simulate a timeout of 2 seconds to patch values on the form.
                         </ion-label>
                         {this.isLoading ? <ion-spinner name="circular" slot="end"></ion-spinner> : <ion-icon name="checkmark-outline" slot="end"></ion-icon>}
+                    </ion-item>
+                </ion-card-content>
+            </ion-card>
+
+            <ion-card>
+                <ion-card-content>
+                    <ion-item>
+                        <ion-label position="floating">Debounce time (milliseconds)</ion-label>
+                        <ion-input type="number" value={this.debounceTime} onIonChange={ev => this.debounceTime = parseInt(ev.detail.value)}></ion-input>
                     </ion-item>
                 </ion-card-content>
             </ion-card>
