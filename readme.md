@@ -315,6 +315,7 @@ export class TestComponent {
 # RoadMap
 
 [ ] remove rxjs dependency
+[ ] add typings for typescript, so we can validate .patch and .set with formGroup definition
 [ ] remove test-component compilation at build time
 [ ] test/verify validators behaviour
 

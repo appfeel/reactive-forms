@@ -270,6 +270,11 @@ export abstract class AbstractControl {
     public readonly value: any;
 
     /**
+     * Custom data so it can be written from validators and available in parent component.
+     */
+    public customData: any = {};
+
+    /**
      * The function that is used to determine the validity of this control synchronously.
      */
     get validator(): ValidatorFn | null {
