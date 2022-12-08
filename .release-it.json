@@ -1,0 +1,19 @@
+{
+    "hooks": {
+        "before:init": ["npm run dist"],
+        "after:github:release": "git push -u origin"
+    },
+    "git": {
+        "tagName": "v${version}",
+        "addUntrackedFiles": true,
+        "requireCleanWorkingDir": false,
+        "pushArgs": "-u github"
+    },
+    "github": {
+        "release": true
+    },
+    "npm": {
+        "publish": true,
+        "access": "public"
+    }
+}
