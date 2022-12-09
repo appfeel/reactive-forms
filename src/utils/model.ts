@@ -270,9 +270,31 @@ export abstract class AbstractControl {
     public readonly value: any;
 
     /**
-     * Custom data so it can be written from validators and available in parent component.
+     * Custom data so it can be written from validators and available in parent control.
      */
-    public customData: any = {};
+    public _customData: { [key: string]: any } = {};
+
+    /**
+     * Sets custom data so it can be written from validators and available in parent control.
+     * @param key the key of the data to save
+     * @param value the data to save
+     */
+    setCustomData(key: string, value: any) {
+        if (value) {
+            this._customData[key] = value;
+        } else {
+            delete this._customData[key];
+        }
+    }
+
+    /**
+     * Gets custom data saved on this control.
+     * @param key the key to read from custom data
+     * @returns the value previously saved or undefined if none available
+     */
+    getCustomData(key: string) {
+        return this._customData[key];
+    }
 
     /**
      * The function that is used to determine the validity of this control synchronously.
