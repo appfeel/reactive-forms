@@ -26,7 +26,7 @@
  */
 // tslint:disable-next-line: max-line-length
 export { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
-export { FormBuilder } from './form_builder';
+export { FormBuilder, FormComponent } from './form_builder';
 export { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup } from './model';
 export { Validators } from './validators';
 // export {VERSION} from './version';
