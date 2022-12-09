@@ -56,6 +56,7 @@ export class ReactiveForm {
         const processed = [];
         dataElements.forEach((htmlElmnt) => {
             // TODO: custom handlers
+            let isOnIonChangeFiring = false;
             const controlName = htmlElmnt.getAttribute(bindingAttr);
             const tagName = htmlElmnt.tagName.toLowerCase();
             if (!controlName) {
@@ -89,7 +90,10 @@ export class ReactiveForm {
             
             control.setHtmlElement(htmlElmnt);
             // Bind events
-            const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => this.onionchange(controlName, ev);
+            const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => {
+                isOnIonChangeFiring = true;
+                this.onionchange(controlName, ev);
+            };
             // Bind ionChange event anyway, so we can handle ion-radio and ion-select properly
             htmlElmnt.addEventListener('ionChange', onIonChangeEventListener);
             this.subscriptions.push(() => htmlElmnt.removeEventListener('ionChange', onIonChangeEventListener));
@@ -98,8 +102,16 @@ export class ReactiveForm {
             for (let i = 0; i < elmts.length; i += 1) {
                 const e = elmts.item(i);
                 e.setAttribute('name', controlName);
-                e.onchange = ev => this.onchange(controlName, ev);
-                e.oninput = ev => this.oninput(controlName, ev);
+                e.onchange = ev => {
+                    if (!isOnIonChangeFiring) {
+                        this.onchange(controlName, ev)
+                    }
+                };
+                e.oninput = ev => {
+                    if (!isOnIonChangeFiring) {
+                        this.oninput(controlName, ev);
+                    }
+                };
                 e.onfocus = () => this.onfocus(controlName);
                 e.onreset = () => this.onreset(controlName);
 
