@@ -31,6 +31,11 @@ function isAbstractControlOptions(options: AbstractControlOptions |
         (<AbstractControlOptions>options).updateOn !== undefined;
 }
 
+export interface FormComponent {
+    getForm(): Promise<FormGroup>;
+}
+
+
 /**
  * @description
  * Creates an `AbstractControl` from a user-specified configuration.
