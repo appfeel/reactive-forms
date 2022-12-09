@@ -87,7 +87,7 @@ export class ReactiveForm {
                 control = this.dataFormGroup.get(controlName);
             }
             
-            control.htmlElement = htmlElmnt;
+            control.setHtmlElement(htmlElmnt);
             // Bind events
             const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => this.onionchange(controlName, ev);
             // Bind ionChange event anyway, so we can handle ion-radio and ion-select properly

@@ -301,14 +301,13 @@ export abstract class AbstractControl {
     /**
      * Gets the DOM html element to which this control is bound.
      */
-    get htmlElement(): HTMLElement {
+    getHtmlElement(): HTMLElement {
         return this._htmlElement;
     }
-
     /**
-     * Sets the html element to which this control is bound.
+     * Sets the DOM html element to which this control is bound.
      */
-    set htmlElement(htmlElement: HTMLElement) {
+    setHtmlElement(htmlElement: HTMLElement) {
         this._htmlElement = htmlElement;
     }
 
