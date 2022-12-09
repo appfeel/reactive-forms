@@ -299,7 +299,7 @@ export abstract class AbstractControl {
     /**
      * The DOM element to which this control is bound.
      */
-    element: Element;
+    element: HTMLElement;
 
     /**
      * The function that is used to determine the validity of this control synchronously.

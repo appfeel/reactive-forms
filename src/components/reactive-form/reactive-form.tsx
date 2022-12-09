@@ -51,7 +51,7 @@ export class ReactiveForm {
 
     bindInputsTextareas(bindingAttr: string) {
         /** Searched 'input' elements to control. Keep in mind to add new exceptions as we did with 'textarea'. */
-        const dataElements = this.reactiveEl.querySelectorAll(`[${bindingAttr}]`);
+        const dataElements = this.reactiveEl.querySelectorAll<HTMLElement>(`[${bindingAttr}]`);
         const allControlNames = this.dataFormGroup ? Object.keys(this.dataFormGroup.controls) : [];
         const processed = [];
         dataElements.forEach((htmlElmnt) => {
