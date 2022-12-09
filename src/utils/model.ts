@@ -5,9 +5,6 @@ import { composeAsyncValidators, composeValidators } from './directives/shared';
 import { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
 import { normalizeValidator, toObservable } from './validators';
 
-export type TValidator = Validator | ValidatorFn | (Validator | ValidatorFn)[];
-export type TAsyncValidator = AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[];
-
 export interface ISetValueOptions {
     /** When true, each change only affects this control, and not its parent. Default is
     * false.*/
@@ -104,8 +101,8 @@ function _find(
  * Gets validators from either an options object or given validators.
  */
 function pickValidators(
-    validatorOrOpts?: TValidator | AbstractControlOptions | null,
-): TValidator | null {
+    validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+): Validator | ValidatorFn | (Validator | ValidatorFn)[] | null {
     return (
         (isOptionsObj(validatorOrOpts)
             ? validatorOrOpts.validators
@@ -117,7 +114,7 @@ function pickValidators(
  * Creates validator function by combining provided validators.
  */
 function coerceToValidator(
-    validator: TValidator | null,
+    validator: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null,
 ): ValidatorFn | null {
     return Array.isArray(validator)
         ? composeValidators(validator)
@@ -128,9 +125,9 @@ function coerceToValidator(
  * Gets async validators from either an options object or given validators.
  */
 function pickAsyncValidators(
-    asyncValidator?: TAsyncValidator | null,
-    validatorOrOpts?: TValidator | AbstractControlOptions | null,
-): TAsyncValidator | null {
+    asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
+    validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+): AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null {
     return (
         (isOptionsObj(validatorOrOpts)
             ? validatorOrOpts.asyncValidators
@@ -142,7 +139,7 @@ function pickAsyncValidators(
  * Creates async validator function by combining provided async validators.
  */
 function coerceToAsyncValidator(
-    asyncValidator?: TAsyncValidator | null,
+    asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
 ): AsyncValidatorFn | null {
     return Array.isArray(asyncValidator)
         ? composeAsyncValidators(asyncValidator)
@@ -161,12 +158,12 @@ export interface AbstractControlOptions {
      * @description
      * The list of validators applied to a control.
      */
-    validators?: TValidator | null;
+    validators?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null;
     /**
      * @description
      * The list of async validators applied to control.
      */
-    asyncValidators?: TAsyncValidator | null;
+    asyncValidators?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null;
     /**
      * @description
      * The event name for control to update upon.
@@ -175,7 +172,7 @@ export interface AbstractControlOptions {
 }
 
 function isOptionsObj(
-    validatorOrOpts?: TValidator | AbstractControlOptions | null,
+    validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
 ): validatorOrOpts is AbstractControlOptions {
     return (
         validatorOrOpts != null &&
@@ -246,7 +243,7 @@ export abstract class AbstractControl {
      *
      * @internal
      */
-    private _rawValidators: TValidator | null;
+    private _rawValidators: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null;
 
     /**
      * Asynchronous validators as they were provided:
@@ -257,7 +254,7 @@ export abstract class AbstractControl {
      *
      * @internal
      */
-    private _rawAsyncValidators: TAsyncValidator | null;
+    private _rawAsyncValidators: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null;
 
     /**
      * The current value of the control.
@@ -501,8 +498,8 @@ export abstract class AbstractControl {
      *     this control asynchronously.
      */
     constructor(
-        validators?: TValidator | null,
-        asyncValidators?: TAsyncValidator | null
+        validators?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null,
+        asyncValidators?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null
     ) {
         this._rawValidators = validators;
         this._rawAsyncValidators = asyncValidators;
@@ -516,7 +513,7 @@ export abstract class AbstractControl {
      * Gets the synchronous validators that are active on this control.
      * @returns Current validators.
      */
-    getValidators(): TValidator | null {
+    getValidators(): Validator | ValidatorFn | (Validator | ValidatorFn)[] | null {
         return this._rawValidators;
     }
 
@@ -528,7 +525,7 @@ export abstract class AbstractControl {
      * `updateValueAndValidity()` for the new validation to take effect.
      *
      */
-    setValidators(newValidator: TValidator | null): void {
+    setValidators(newValidator: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null): void {
         this._rawValidators = newValidator;
         this._composedValidatorFn = coerceToValidator(newValidator);
     }
@@ -537,7 +534,7 @@ export abstract class AbstractControl {
      * Gets the async validators that are active on this control.
      * @returns Current validators.
      */
-    getAsyncValidators(): TAsyncValidator | null {
+    getAsyncValidators(): AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null {
         return this._rawAsyncValidators;
     }
 
@@ -550,7 +547,7 @@ export abstract class AbstractControl {
      *
      */
     setAsyncValidators(
-        newValidator: TAsyncValidator | null,
+        newValidator: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
     ): void {
         this._rawAsyncValidators = newValidator;
         this._composedAsyncValidatorFn = coerceToAsyncValidator(newValidator);
@@ -1130,7 +1127,7 @@ export abstract class AbstractControl {
 
     /** @internal */
     _setUpdateStrategy(
-        opts?: TValidator | AbstractControlOptions | null,
+        opts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
     ): void {
         if (isOptionsObj(opts) && opts.updateOn != null) {
             this._updateOn = opts.updateOn!;
@@ -1270,8 +1267,8 @@ export class FormControl extends AbstractControl {
      */
     constructor(
         formState: any = null,
-        validatorOrOpts?: TValidator | AbstractControlOptions | null,
-        asyncValidator?: TAsyncValidator | null,
+        validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
     ) {
         super(
             pickValidators(validatorOrOpts),
@@ -1518,8 +1515,8 @@ export class FormGroup extends AbstractControl {
      */
     constructor(
         public controls: { [key: string]: AbstractControl },
-        validatorOrOpts?: TValidator | AbstractControlOptions | null,
-        asyncValidator?: TAsyncValidator | null,
+        validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
     ) {
         super(
             pickValidators(validatorOrOpts),
@@ -1975,8 +1972,8 @@ export class FormArray extends AbstractControl {
      */
     constructor(
         public controls: AbstractControl[],
-        validatorOrOpts?: TValidator | AbstractControlOptions | null,
-        asyncValidator?: TAsyncValidator | null,
+        validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
     ) {
         super(
             pickValidators(validatorOrOpts),

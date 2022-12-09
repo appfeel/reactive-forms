@@ -15,12 +15,14 @@
  */
 
 
-import { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup, FormHooks, TAsyncValidator, TValidator } from './model';
+import { AsyncValidator, AsyncValidatorFn, Validator, ValidatorFn } from './forms';
+import { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup, FormHooks } from './model';
 
-export type TControlsConfig = FormControl | FormGroup | FormArray
+export type TControlsConfig =
+    | FormControl | FormGroup | FormArray
     | [string]
-    | [string, TValidator]
-    | [string, TValidator, TAsyncValidator];
+    | [string, Validator | ValidatorFn | (Validator | ValidatorFn)[]]
+    | [string, Validator | ValidatorFn | (Validator | ValidatorFn)[], AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[]];
 
 function isAbstractControlOptions(options: AbstractControlOptions |
 { [key: string]: any }): options is AbstractControlOptions {
@@ -68,8 +70,8 @@ export class FormBuilder {
         options: AbstractControlOptions | { [key: string]: any } | null = null): FormGroup {
         const controls = this._reduceControls(controlsConfig);
 
-        let validators: TValidator | null = null;
-        let asyncValidators: TAsyncValidator | null = null;
+        let validators: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null = null;
+        let asyncValidators: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null = null;
         let updateOn: FormHooks | undefined = undefined;
 
         if (options != null) {
@@ -112,8 +114,8 @@ export class FormBuilder {
      * </code-example>
      */
     control(
-        formState: any, validatorOrOpts?: TValidator | AbstractControlOptions | null,
-        asyncValidator?: TAsyncValidator | null): FormControl {
+        formState: any, validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null): FormControl {
         return new FormControl(formState, validatorOrOpts, asyncValidator);
     }
 
@@ -133,8 +135,8 @@ export class FormBuilder {
      */
     array(
         controlsConfig: (TControlsConfig | any)[],
-        validatorOrOpts?: TValidator | AbstractControlOptions | null,
-        asyncValidator?: TAsyncValidator | null): FormArray {
+        validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
+        asyncValidator?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null): FormArray {
         const controls = controlsConfig.map(c => this._createControl(c));
         return new FormArray(controls, validatorOrOpts, asyncValidator);
     }
@@ -158,8 +160,8 @@ export class FormBuilder {
 
         } else if (Array.isArray(controlConfig)) {
             const value = controlConfig[0];
-            const validator: TValidator | null = controlConfig.length > 1 ? controlConfig[1] : null;
-            const asyncValidator: TAsyncValidator | null = controlConfig.length > 2 ? controlConfig[2] : null;
+            const validator: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null = controlConfig.length > 1 ? controlConfig[1] : null;
+            const asyncValidator: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null = controlConfig.length > 2 ? controlConfig[2] : null;
             return this.control(value, validator, asyncValidator);
 
         } else {
