@@ -442,7 +442,7 @@ function executeValidators<V extends GenericValidatorFn>(
 }
 
 function isValidatorFn<V>(validator: V | Validator | AsyncValidator): validator is V {
-    return !((validator as Validator)?.validate);
+    return !(validator as Validator) || !(validator as Validator).validate;
 }
 
 /**
