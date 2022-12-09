@@ -1,6 +1,6 @@
 {
     "hooks": {
-        "before:init": ["npm run dist"],
+        "before:init": ["npm run dist", "git branch master -u github/master"],
         "after:github:release": "git push -u origin"
     },
     "git": {
