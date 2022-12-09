@@ -1,6 +1,6 @@
 {
     "name": "forms-reactive",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "description": "Reactive Form Web Component",
     "main": "dist/index.cjs.js",
     "module": "dist/index.js",
