@@ -296,10 +296,21 @@ export abstract class AbstractControl {
         return this._customData[key];
     }
 
+    private _htmlElement: HTMLElement;
+
     /**
-     * The DOM element to which this control is bound.
+     * Gets the DOM html element to which this control is bound.
      */
-    element: HTMLElement;
+    get htmlElement(): HTMLElement {
+        return this._htmlElement;
+    }
+
+    /**
+     * Sets the html element to which this control is bound.
+     */
+    set htmlElement(htmlElement: HTMLElement) {
+        this._htmlElement = htmlElement;
+    }
 
     /**
      * The function that is used to determine the validity of this control synchronously.
