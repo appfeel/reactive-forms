@@ -446,6 +446,19 @@ function isValidatorFn<V>(validator: V | Validator | AsyncValidator): validator 
 }
 
 /**
+ * Given a validator that may be a function or a class, return the
+ * validator function (convert validator classes into validator functions).
+ *
+ * @param validators The validator that may be a plain function
+ *     as well as represented as a validator class.
+ */
+export function normalizeValidator<V>(validator: V | Validator | AsyncValidator): V {
+    return isValidatorFn<V>(validator)
+        ? validator
+        : ((c: AbstractControl) => validator.validate(c)) as unknown as V;
+}
+
+/**
  * Given the list of validators that may contain both functions as well as classes, return the list
  * of validator functions (convert validator classes into validator functions). This is needed to
  * have consistent structure in validators list before composing them.
@@ -454,7 +467,5 @@ function isValidatorFn<V>(validator: V | Validator | AsyncValidator): validator 
  *     as well as represented as a validator class.
  */
 export function normalizeValidators<V>(validators: (V | Validator | AsyncValidator)[]): V[] {
-    return validators.map(validator => isValidatorFn<V>(validator) ?
-        validator :
-        ((c: AbstractControl) => validator.validate(c)) as unknown as V);
+    return validators.map(validator => normalizeValidator(validator));
 }
