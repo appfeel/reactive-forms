@@ -2,7 +2,7 @@ import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@
 import { Subscription } from 'rxjs';
 import { Debouncer } from '../../utils/debouncer';
 
-import { FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
+import { AbstractControl, FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
 
 @Component({
     tag: 'reactive-form',
@@ -73,17 +73,21 @@ export class ReactiveForm {
             // Select elements
             const elmts: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = this.getElements(bindingAttr, controlName);
 
+            let control: AbstractControl;
             if (this.dataFormGroup && allControlNames.indexOf(controlName) < 0) {
                 console.warn(`Missing form control for element '[${bindingAttr}="${controlName}"]'`);
-                this.dataFormGroup.registerControl(controlName, new FormControl());
+                control = this.dataFormGroup.registerControl(controlName, new FormControl());
                 this.dataFormGroup.updateValueAndValidity({ onlySelf: true, emitEvent: true });
                 if (this.dataDebounceTime > 0) {
                     this.valueDebouncer.debounce(() => this.valueChanges.emit(this.dataFormGroup.value), this.dataDebounceTime);
                 } else {
                     this.valueChanges.emit(this.dataFormGroup.value);
                 }
+            } else {
+                control = this.dataFormGroup.get(controlName);
             }
-
+            
+            control.element = htmlElmnt;
             // Bind events
             const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => this.onionchange(controlName, ev);
             // Bind ionChange event anyway, so we can handle ion-radio and ion-select properly

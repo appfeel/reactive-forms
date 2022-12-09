@@ -297,6 +297,11 @@ export abstract class AbstractControl {
     }
 
     /**
+     * The DOM element to which this control is binded
+     */
+    element: Element;
+
+    /**
      * The function that is used to determine the validity of this control synchronously.
      */
     get validator(): ValidatorFn | null {
@@ -493,8 +498,8 @@ export abstract class AbstractControl {
      *     this control asynchronously.
      */
     constructor(
-        validators: ValidatorFn | ValidatorFn[] | null,
-        asyncValidators: AsyncValidatorFn | AsyncValidatorFn[] | null,
+        validators?: ValidatorFn | ValidatorFn[] | null,
+        asyncValidators?: AsyncValidatorFn | AsyncValidatorFn[] | null
     ) {
         this._rawValidators = validators;
         this._rawAsyncValidators = asyncValidators;
