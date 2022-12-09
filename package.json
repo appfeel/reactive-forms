@@ -39,6 +39,7 @@
         "build": "stencil build --docs",
         "dist": "rimraf dist; stencil build --dist --docs",
         "start": "stencil build --dev --watch --serve",
+        "build-watch": "rimraf dist; stencil build --dist --watch",
         "test": "stencil test --spec --e2e",
         "test.watch": "stencil test --spec --e2e --watchAll",
         "generate": "stencil generate",
