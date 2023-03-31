@@ -40,9 +40,6 @@ export class ReactiveForm {
             const unsubscriber = this.subscriptions.pop();
             unsubscriber();
         }
-        if (this.dataFormGroup) {
-            this.load();
-        }
     }
 
     load() {
