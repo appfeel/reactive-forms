@@ -1,7 +1,7 @@
 import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@stencil/core';
 import { Subscription } from 'rxjs';
-import { Debouncer } from '../../utils/debouncer';
 
+import { Debouncer } from '../../utils/debouncer';
 import { AbstractControl, FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
 
 @Component({
@@ -21,7 +21,7 @@ export class ReactiveForm {
     @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter;
 
     defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range', 'ion-toggle'];
-    subscriptions: Function[] = [];
+    subscriptions: (() => void)[] = [];
 
     valueDebouncer = new Debouncer();
     statusDebouncer = new Debouncer();
@@ -84,10 +84,10 @@ export class ReactiveForm {
             } else {
                 control = this.dataFormGroup.get(controlName);
             }
-            
+
             control.setHtmlElement(htmlElmnt);
             // Bind events
-            const onIonChangeEventListener: EventListenerOrEventListenerObject = ev => {
+            const onIonChangeEventListener: EventListenerOrEventListenerObject = (ev) => {
                 isOnIonChangeFiring = true;
                 this.onionchange(controlName, ev);
             };
@@ -99,12 +99,14 @@ export class ReactiveForm {
             for (let i = 0; i < elmts.length; i += 1) {
                 const e = elmts.item(i);
                 e.setAttribute('name', controlName);
-                e.onchange = ev => {
+                // eslint-disable-next-line no-loop-func, @typescript-eslint/no-loop-func
+                e.onchange = (ev) => {
                     if (!isOnIonChangeFiring) {
-                        this.onchange(controlName, ev)
+                        this.onchange(controlName, ev);
                     }
                 };
-                e.oninput = ev => {
+                // eslint-disable-next-line no-loop-func, @typescript-eslint/no-loop-func
+                e.oninput = (ev) => {
                     if (!isOnIonChangeFiring) {
                         this.oninput(controlName, ev);
                     }
@@ -256,12 +258,15 @@ export class ReactiveForm {
         const query = `[${this.dataAttributeName}="${name}"]`;
         const el = this.reactiveEl.querySelector(query);
 
-        if (this.dataFormGroup.controls[name].status === VALID) {
-            el.classList.remove('invalid');
-            el.classList.add('valid');
-        } else {
-            el.classList.remove('valid');
-            el.classList.add('invalid');
+        // Puede ser que el elemento ya no exista, si se actualiza el dataFormGroup
+        if (el) {
+            if (this.dataFormGroup.controls[name].status === VALID) {
+                el.classList.remove('invalid');
+                el.classList.add('valid');
+            } else {
+                el.classList.remove('valid');
+                el.classList.add('invalid');
+            }
         }
     }
 
@@ -272,7 +277,7 @@ export class ReactiveForm {
             // once in this.dataFormGroup.controls[controlName].valueChanges.subscribe()
             // other one in updateInputValue()
             if (e.type === 'checkbox' || tagName === 'ion-checkbox' || e.type === 'toggle' || tagName === 'ion-toggle') {
-                e['checked'] = this.dataFormGroup.controls[controlName].value;
+                (e as any).checked = this.dataFormGroup.controls[controlName].value;
             } else {
                 e.value = this.dataFormGroup.controls[controlName].value;
             }

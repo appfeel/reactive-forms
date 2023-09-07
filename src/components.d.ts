@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { FormGroup } from "./utils/model";
+export { FormGroup } from "./utils/model";
 export namespace Components {
     interface ReactiveForm {
         "dataAdditionalSelfHosted": any[];

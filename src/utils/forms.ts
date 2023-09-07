@@ -25,21 +25,33 @@
  * explicitly.
  */
 // tslint:disable-next-line: max-line-length
-export { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
-export { FormBuilder, FormComponent } from './form_builder';
-export { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup } from './model';
-export { Validators } from './validators';
 // export {VERSION} from './version';
 
 // export * from './form_providers';
 
-import { Validators } from './validators';
-import { AbstractControl, FormArray, FormControl, FormGroup } from './model';
 import { FormBuilder } from './form_builder';
+import { AbstractControl, FormArray, FormControl, FormGroup } from './model';
+import { Validators } from './validators';
 
-window['FormBuilder'] = FormBuilder;
-window['Validators'] = Validators;
-window['AbstractControl'] = AbstractControl;
-window['FormArray'] = FormArray;
-window['FormControl'] = FormControl;
-window['FormGroup'] = FormGroup;
+export { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
+export { FormBuilder, FormComponent } from './form_builder';
+export { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup } from './model';
+export { Validators } from './validators';
+
+declare global {
+    interface Window {
+        FormBuilder: typeof FormBuilder;
+        Validators: typeof Validators;
+        AbstractControl: typeof AbstractControl;
+        FormArray: typeof FormArray;
+        FormControl: typeof FormControl;
+        FormGroup: typeof FormGroup;
+    }
+}
+
+window.FormBuilder = FormBuilder;
+window.Validators = Validators;
+window.AbstractControl = AbstractControl;
+window.FormArray = FormArray;
+window.FormControl = FormControl;
+window.FormGroup = FormGroup;

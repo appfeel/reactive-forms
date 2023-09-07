@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable max-classes-per-file */
 // tslint:disable: function-name variable-name
 import { Subject } from 'rxjs';
 
@@ -7,7 +10,7 @@ import { normalizeValidator, toObservable } from './validators';
 
 export interface ISetValueOptions {
     /** When true, each change only affects this control, and not its parent. Default is
-    * false.*/
+    * false. */
     onlySelf?: boolean;
     /** `emitEvent`: When true or not supplied (the default), both the `statusChanges` and
     * `valueChanges`
@@ -24,7 +27,7 @@ export interface ISetFormControlValueOptions extends ISetValueOptions {
     emitModelToViewChange?: boolean;
     /** `emitViewToModelChange`: When true or not supplied (the default), each change triggers an
     * `ngModelChange`
-    * event to update the model.*/
+    * event to update the model. */
     emitViewToModelChange?: boolean;
 }
 
@@ -175,9 +178,9 @@ function isOptionsObj(
     validatorOrOpts?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | AbstractControlOptions | null,
 ): validatorOrOpts is AbstractControlOptions {
     return (
-        validatorOrOpts != null &&
-        !Array.isArray(validatorOrOpts) &&
-        typeof validatorOrOpts === 'object'
+        validatorOrOpts != null
+        && !Array.isArray(validatorOrOpts)
+        && typeof validatorOrOpts === 'object'
     );
 }
 
@@ -304,6 +307,7 @@ export abstract class AbstractControl {
     getHtmlElement(): HTMLElement {
         return this._htmlElement;
     }
+
     /**
      * Sets the DOM html element to which this control is bound.
      */
@@ -317,6 +321,7 @@ export abstract class AbstractControl {
     get validator(): ValidatorFn | null {
         return this._composedValidatorFn;
     }
+
     set validator(validatorFn: ValidatorFn | null) {
         this._rawValidators = this._composedValidatorFn = validatorFn;
     }
@@ -327,6 +332,7 @@ export abstract class AbstractControl {
     get asyncValidator(): AsyncValidatorFn | null {
         return this._composedAsyncValidatorFn;
     }
+
     set asyncValidator(asyncValidatorFn: AsyncValidatorFn | null) {
         this._rawAsyncValidators = this._composedAsyncValidatorFn = asyncValidatorFn;
     }
@@ -509,7 +515,7 @@ export abstract class AbstractControl {
      */
     constructor(
         validators?: Validator | ValidatorFn | (Validator | ValidatorFn)[] | null,
-        asyncValidators?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null
+        asyncValidators?: AsyncValidator | AsyncValidatorFn | (AsyncValidator | AsyncValidatorFn)[] | null,
     ) {
         this._rawValidators = validators;
         this._rawAsyncValidators = asyncValidators;
@@ -616,9 +622,7 @@ export abstract class AbstractControl {
     markAllAsTouched(): void {
         this.markAsTouched({ onlySelf: true });
 
-        this._forEachChild((control: AbstractControl) =>
-            control.markAllAsTouched(),
-        );
+        this._forEachChild((control: AbstractControl) => control.markAllAsTouched());
     }
 
     /**
@@ -865,9 +869,7 @@ export abstract class AbstractControl {
 
     /** @internal */
     _updateTreeValidity(opts: { emitEvent?: boolean } = { emitEvent: true }) {
-        this._forEachChild((ctrl: AbstractControl) =>
-            ctrl._updateTreeValidity(opts),
-        );
+        this._forEachChild((ctrl: AbstractControl) => ctrl._updateTreeValidity(opts));
         this.updateValueAndValidity({ onlySelf: true, emitEvent: opts.emitEvent });
     }
 
@@ -1057,8 +1059,8 @@ export abstract class AbstractControl {
         if (this._allControlsDisabled()) return DISABLED;
         if (this.errors) return INVALID;
         if (
-            this._hasOwnPendingAsyncValidator ||
-            this._anyControlsHaveStatus(PENDING)
+            this._hasOwnPendingAsyncValidator
+            || this._anyControlsHaveStatus(PENDING)
         ) {
             return PENDING;
         }
@@ -1122,11 +1124,11 @@ export abstract class AbstractControl {
     /** @internal */
     _isBoxedValue(formState: any): boolean {
         return (
-            typeof formState === 'object' &&
-            formState !== null &&
-            Object.keys(formState).length === 2 &&
-            'value' in formState &&
-            'disabled' in formState
+            typeof formState === 'object'
+            && formState !== null
+            && Object.keys(formState).length === 2
+            && 'value' in formState
+            && 'disabled' in formState
         );
     }
 
@@ -1312,10 +1314,13 @@ export class FormControl extends AbstractControl {
         options: ISetFormControlValueOptions = {},
     ): void {
         (this as { value: any }).value = this._pendingValue = value;
+        try {
+            const htmlElement = this.getHtmlElement() as HTMLInputElement;
+            htmlElement.value = value;
+        } catch (_e) {
+        }
         if (this._onChange.length && options.emitModelToViewChange) {
-            this._onChange.forEach(changeFn =>
-                changeFn(this.value, options.emitViewToModelChange),
-            );
+            this._onChange.forEach(changeFn => changeFn(this.value, options.emitViewToModelChange));
         }
         this.updateValueAndValidity(options);
     }
@@ -1617,8 +1622,8 @@ export class FormGroup extends AbstractControl {
      */
     contains(controlName: string): boolean {
         return (
-            this.controls.hasOwnProperty(controlName) &&
-            this.controls[controlName].enabled
+            this.controls.hasOwnProperty(controlName)
+            && this.controls[controlName].enabled
         );
     }
 
@@ -1789,10 +1794,9 @@ export class FormGroup extends AbstractControl {
                 control: AbstractControl,
                 name: string,
             ) => {
-                acc[name] =
-                    control instanceof FormControl
-                        ? control.value
-                        : (<any>control).getRawValue();
+                acc[name] = control instanceof FormControl
+                    ? control.value
+                    : (<any>control).getRawValue();
                 return acc;
             },
         );
@@ -1802,9 +1806,7 @@ export class FormGroup extends AbstractControl {
     _syncPendingControls(): boolean {
         const subtreeUpdated = this._reduceChildren(
             false,
-            (updated: boolean, child: AbstractControl) => {
-                return child._syncPendingControls() ? true : updated;
-            },
+            (updated: boolean, child: AbstractControl) => (child._syncPendingControls() ? true : updated),
         );
         if (subtreeUpdated) this.updateValueAndValidity({ onlySelf: true });
         return subtreeUpdated;
@@ -1825,9 +1827,7 @@ export class FormGroup extends AbstractControl {
 
     /** @internal */
     _forEachChild(cb: (v: any, k: string) => void): void {
-        Object.keys(this.controls).forEach((k) => {
-            return cb(this.controls[k], k);
-        });
+        Object.keys(this.controls).forEach(k => cb(this.controls[k], k));
     }
 
     /** @internal */
@@ -2224,11 +2224,9 @@ export class FormArray extends AbstractControl {
      * For enabled controls only, the `value` property is the best way to get the value of the array.
      */
     getRawValue(): any[] {
-        return this.controls.map((control: AbstractControl) => {
-            return control instanceof FormControl
-                ? control.value
-                : (<any>control).getRawValue();
-        });
+        return this.controls.map((control: AbstractControl) => (control instanceof FormControl
+            ? control.value
+            : (<any>control).getRawValue()));
     }
 
     /**
@@ -2263,9 +2261,7 @@ export class FormArray extends AbstractControl {
      */
     clear(): void {
         if (this.controls.length < 1) return;
-        this._forEachChild((control: AbstractControl) =>
-            control._registerOnCollectionChange(() => { }),
-        );
+        this._forEachChild((control: AbstractControl) => control._registerOnCollectionChange(() => { }));
         this.controls.splice(0);
         this.updateValueAndValidity();
     }
@@ -2273,9 +2269,7 @@ export class FormArray extends AbstractControl {
     /** @internal */
     _syncPendingControls(): boolean {
         const subtreeUpdated = this.controls.reduce(
-            (updated: boolean, child: AbstractControl) => {
-                return child._syncPendingControls() ? true : updated;
-            },
+            (updated: boolean, child: AbstractControl) => (child._syncPendingControls() ? true : updated),
             false,
         );
         if (subtreeUpdated) this.updateValueAndValidity({ onlySelf: true });
@@ -2305,12 +2299,8 @@ export class FormArray extends AbstractControl {
     /** @internal */
     _updateValue(): void {
         (this as { value: any }).value = this.controls
-            .filter((control) => {
-                return control.enabled || this.disabled;
-            })
-            .map((control) => {
-                return control.value;
-            });
+            .filter(control => control.enabled || this.disabled)
+            .map(control => control.value);
     }
 
     /** @internal */
@@ -2322,9 +2312,7 @@ export class FormArray extends AbstractControl {
 
     /** @internal */
     _setUpControls(): void {
-        this._forEachChild((control: AbstractControl) =>
-            this._registerControl(control),
-        );
+        this._forEachChild((control: AbstractControl) => this._registerControl(control));
     }
 
     /** @internal */
