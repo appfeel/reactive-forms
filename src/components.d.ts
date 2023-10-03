@@ -6,7 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { FormGroup } from "./utils/model";
+import { ReactiveFormStatus } from "./utils/types";
 export { FormGroup } from "./utils/model";
+export { ReactiveFormStatus } from "./utils/types";
 export namespace Components {
     interface ReactiveForm {
         "dataAdditionalSelfHosted": any[];
@@ -45,7 +47,7 @@ declare namespace LocalJSX {
         "dataAttributeName"?: string;
         "dataDebounceTime"?: number;
         "dataFormGroup": FormGroup;
-        "onStatusChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
+        "onStatusChanges"?: (event: ReactiveFormCustomEvent<ReactiveFormStatus>) => void;
         "onValueChanges"?: (event: ReactiveFormCustomEvent<any>) => void;
     }
     interface TestComponent {

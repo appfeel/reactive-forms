@@ -2,7 +2,8 @@ import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@
 import { Subscription } from 'rxjs';
 
 import { Debouncer } from '../../utils/debouncer';
-import { AbstractControl, FormControl, FormGroup, ISetFormControlValueOptions, VALID } from '../../utils/model';
+import { AbstractControl, FormControl, FormGroup } from '../../utils/model';
+import { ISetFormControlValueOptions, ReactiveFormStatus } from '../../utils/types';
 
 @Component({
     tag: 'reactive-form',
@@ -17,8 +18,8 @@ export class ReactiveForm {
 
     @Element() reactiveEl: HTMLElement;
 
-    @Event({ eventName: 'valueChanges' }) valueChanges: EventEmitter;
-    @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter;
+    @Event({ eventName: 'valueChanges' }) valueChanges: EventEmitter<any>;
+    @Event({ eventName: 'statusChanges' }) statusChanges: EventEmitter<ReactiveFormStatus>;
 
     defaultSelfHosted = ['ion-select', 'ion-checkbox', 'ion-radio-group', 'ion-range', 'ion-toggle'];
     subscriptions: (() => void)[] = [];
@@ -260,7 +261,7 @@ export class ReactiveForm {
 
         // Puede ser que el elemento ya no exista, si se actualiza el dataFormGroup
         if (el) {
-            if (this.dataFormGroup.controls[name].status === VALID) {
+            if (this.dataFormGroup.controls[name].status === ReactiveFormStatus.VALID) {
                 el.classList.remove('invalid');
                 el.classList.add('valid');
             } else {

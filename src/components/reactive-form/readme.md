@@ -17,10 +17,10 @@
 
 ## Events
 
-| Event           | Description | Type               |
-| --------------- | ----------- | ------------------ |
-| `statusChanges` |             | `CustomEvent<any>` |
-| `valueChanges`  |             | `CustomEvent<any>` |
+| Event           | Description | Type                                                                                                                               |
+| --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `statusChanges` |             | `CustomEvent<ReactiveFormStatus.DISABLED \| ReactiveFormStatus.INVALID \| ReactiveFormStatus.PENDING \| ReactiveFormStatus.VALID>` |
+| `valueChanges`  |             | `CustomEvent<any>`                                                                                                                 |
 
 
 ## Dependencies

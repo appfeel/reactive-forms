@@ -114,8 +114,7 @@ export interface AsyncValidator extends Validator {
      * @returns A promise or observable that resolves a map of validation errors
      * if validation fails, otherwise null.
      */
-    validate(control: AbstractControl):
-        Promise<ValidationErrors | null> | Observable<ValidationErrors | null>;
+    validate(control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null>;
 }
 
 /**

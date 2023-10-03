@@ -30,8 +30,43 @@ export function hasValidLength(value: any): boolean {
     return value != null && typeof value.length === 'number';
 }
 
-const EMAIL_REGEXP =
-    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+// eslint-disable-next-line max-len
+const EMAIL_REGEXP = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+function isPresent(o: any): boolean {
+    return o != null;
+}
+
+function mergeErrors(arrayOfErrors: (ValidationErrors | null)[]): ValidationErrors | null {
+    let res: { [key: string]: any } = {};
+
+    // Not using Array.reduce here due to a Chrome 80 bug
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+    arrayOfErrors.forEach((errors: ValidationErrors | null) => {
+        res = errors != null ? { ...res!, ...errors } : res!;
+    });
+
+    return Object.keys(res).length === 0 ? null : res;
+}
+
+type GenericValidatorFn = (control: AbstractControl) => any;
+
+function executeValidators<V extends GenericValidatorFn>(control: AbstractControl, validators: V[]): ReturnType<V>[] {
+    return validators.map(validator => validator(control));
+}
+
+function isValidatorFn<V>(validator: V | Validator | AsyncValidator): validator is V {
+    return !(validator as Validator) || !(validator as Validator).validate;
+}
+
+export function toObservable(r: any): Observable<any> {
+    const obs = r instanceof Promise ? from(r) : r;
+
+    if (!(obs instanceof Observable)) {
+        throw new Error('Expected validator to return Promise or Observable.');
+    }
+    return obs;
+}
 
 /**
  * @description
@@ -69,13 +104,13 @@ export class Validators {
     static min(min: number): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             if (isEmptyInputValue(control.value) || isEmptyInputValue(min)) {
-                return null;  // don't validate empty values to allow optional controls
+                return null; // don't validate empty values to allow optional controls
             }
             const value = parseFloat(control.value);
             // Controls with NaN values after parsing should be treated as not having a
             // minimum, per the HTML forms spec: https://www.w3.org/TR/html5/forms.html#attr-input-min
             // tslint:disable-next-line: object-literal-key-quotes
-            return !isNaN(value) && value < min ? { 'min': { 'min': min, 'actual': control.value } } : null;
+            return !Number.isNaN(value) && value < min ? { min: { min, actual: control.value } } : null;
         };
     }
 
@@ -103,13 +138,13 @@ export class Validators {
     static max(max: number): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             if (isEmptyInputValue(control.value) || isEmptyInputValue(max)) {
-                return null;  // don't validate empty values to allow optional controls
+                return null; // don't validate empty values to allow optional controls
             }
             const value = parseFloat(control.value);
             // Controls with NaN values after parsing should be treated as not having a
             // maximum, per the HTML forms spec: https://www.w3.org/TR/html5/forms.html#attr-input-max
             // tslint:disable-next-line: object-literal-key-quotes
-            return !isNaN(value) && value > max ? { 'max': { 'max': max, 'actual': control.value } } : null;
+            return !Number.isNaN(value) && value > max ? { max: { max, actual: control.value } } : null;
         };
     }
 
@@ -135,7 +170,7 @@ export class Validators {
      */
     static required(control: AbstractControl): ValidationErrors | null {
         // tslint:disable-next-line: object-literal-key-quotes
-        return isEmptyInputValue(control.value) ? { 'required': true } : null;
+        return isEmptyInputValue(control.value) ? { required: true } : null;
     }
 
     /**
@@ -161,7 +196,7 @@ export class Validators {
      */
     static requiredTrue(control: AbstractControl): ValidationErrors | null {
         // tslint:disable-next-line: object-literal-key-quotes
-        return control.value === true ? null : { 'required': true };
+        return control.value === true ? null : { required: true };
     }
 
     /**
@@ -202,11 +237,11 @@ export class Validators {
      */
     static email(control: AbstractControl): ValidationErrors | null {
         if (isEmptyInputValue(control.value)) {
-            return null;  // don't validate empty values to allow optional controls
+            return null; // don't validate empty values to allow optional controls
         }
         // tslint:disable-next-line: object-literal-key-quotes
         EMAIL_REGEXP.lastIndex = 0;
-        return EMAIL_REGEXP.test(control.value) ? null : { 'email': true };
+        return EMAIL_REGEXP.test(control.value) ? null : { email: true };
     }
 
     /**
@@ -247,10 +282,10 @@ export class Validators {
                 return null;
             }
 
-            return control.value.length < minLength ?
+            return control.value.length < minLength
                 // tslint:disable-next-line: object-literal-key-quotes
-                { 'minlength': { 'requiredLength': minLength, 'actualLength': control.value.length } } :
-                null;
+                ? { minlength: { requiredLength: minLength, actualLength: control.value.length } }
+                : null;
         };
     }
 
@@ -282,12 +317,10 @@ export class Validators {
      *
      */
     static maxLength(maxLength: number): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            return hasValidLength(control.value) && control.value.length > maxLength ?
-                // tslint:disable-next-line: object-literal-key-quotes
-                { 'maxlength': { 'requiredLength': maxLength, 'actualLength': control.value.length } } :
-                null;
-        };
+        return (control: AbstractControl): ValidationErrors | null => (hasValidLength(control.value) && control.value.length > maxLength
+        // tslint:disable-next-line: object-literal-key-quotes
+            ? { maxlength: { requiredLength: maxLength, actualLength: control.value.length } }
+            : null);
     }
 
     /**
@@ -342,12 +375,12 @@ export class Validators {
         }
         return (control: AbstractControl): ValidationErrors | null => {
             if (isEmptyInputValue(control.value)) {
-                return null;  // don't validate empty values to allow optional controls
+                return null; // don't validate empty values to allow optional controls
             }
-            const value: string = control.value;
+            const { value } = control;
             regex.lastIndex = 0; // Reset regex!!
-            return regex.test(value) ? null :
-                { pattern: { requiredPattern: regexStr, actualValue: value } };
+            return regex.test(value) ? null
+                : { pattern: { requiredPattern: regexStr, actualValue: value } };
         };
     }
 
@@ -358,7 +391,7 @@ export class Validators {
      * @see `updateValueAndValidity()`
      *
      */
-    static nullValidator(control: AbstractControl): ValidationErrors | null {
+    static nullValidator(_control: AbstractControl): ValidationErrors | null {
         return null;
     }
 
@@ -401,48 +434,11 @@ export class Validators {
         const presentValidators: AsyncValidatorFn[] = validators.filter(isPresent) as any;
         if (presentValidators.length === 0) return null;
 
-        return function (control: AbstractControl) {
-            const observables =
-                executeValidators<AsyncValidatorFn>(control, presentValidators).map(toObservable);
+        return (control: AbstractControl) => {
+            const observables = executeValidators<AsyncValidatorFn>(control, presentValidators).map(toObservable);
             return forkJoin(observables).pipe(map(mergeErrors));
         };
     }
-}
-
-export function toObservable(r: any): Observable<any> {
-    const obs = r instanceof Promise ? from(r) : r;
-
-    if (!(obs instanceof Observable)) {
-        throw new Error(`Expected validator to return Promise or Observable.`);
-    }
-    return obs;
-}
-
-function isPresent(o: any): boolean {
-    return o != null;
-}
-
-function mergeErrors(arrayOfErrors: (ValidationErrors | null)[]): ValidationErrors | null {
-    let res: { [key: string]: any } = {};
-
-    // Not using Array.reduce here due to a Chrome 80 bug
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
-    arrayOfErrors.forEach((errors: ValidationErrors | null) => {
-        res = errors != null ? { ...res!, ...errors } : res!;
-    });
-
-    return Object.keys(res).length === 0 ? null : res;
-}
-
-type GenericValidatorFn = (control: AbstractControl) => any;
-
-function executeValidators<V extends GenericValidatorFn>(
-    control: AbstractControl, validators: V[]): ReturnType<V>[] {
-    return validators.map(validator => validator(control));
-}
-
-function isValidatorFn<V>(validator: V | Validator | AsyncValidator): validator is V {
-    return !(validator as Validator) || !(validator as Validator).validate;
 }
 
 /**

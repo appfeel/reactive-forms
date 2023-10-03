@@ -34,9 +34,10 @@ import { AbstractControl, FormArray, FormControl, FormGroup } from './model';
 import { Validators } from './validators';
 
 export { AsyncValidator, AsyncValidatorFn, ValidationErrors, Validator, ValidatorFn } from './directives/validators';
-export { FormBuilder, FormComponent } from './form_builder';
+export { FormBuilder } from './form_builder';
 export { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup } from './model';
 export { Validators } from './validators';
+export { ReactiveFormStatus } from './types';
 
 declare global {
     interface Window {

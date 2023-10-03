@@ -14,7 +14,7 @@
  * found in the LICENSE file at https://github.com/appfeel/reactive-forms/LICENSE
  */
 
-import { AsyncValidator, AsyncValidatorFn, Validator, ValidatorFn } from './forms';
+import { AsyncValidator, AsyncValidatorFn, Validator, ValidatorFn } from './directives/validators';
 import { AbstractControl, AbstractControlOptions, FormArray, FormControl, FormGroup, FormHooks } from './model';
 
 export type TControlsConfig =
@@ -28,10 +28,6 @@ function isAbstractControlOptions(options: AbstractControlOptions |
     return (<AbstractControlOptions>options).asyncValidators !== undefined
         || (<AbstractControlOptions>options).validators !== undefined
         || (<AbstractControlOptions>options).updateOn !== undefined;
-}
-
-export interface FormComponent {
-    getForm(): Promise<FormGroup>;
 }
 
 /**
