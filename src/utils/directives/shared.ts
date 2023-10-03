@@ -26,8 +26,7 @@ export function composeValidators(validators: Array<Validator | ValidatorFn>): V
 }
 
 // tslint:disable-next-line: prefer-array-literal
-export function composeAsyncValidators(validators: Array<AsyncValidator | AsyncValidatorFn>):
-AsyncValidatorFn | null {
+export function composeAsyncValidators(validators: Array<AsyncValidator | AsyncValidatorFn>): AsyncValidatorFn | null {
     return validators != null
         ? Validators.composeAsync(normalizeValidators<AsyncValidatorFn>(validators))
         : null;

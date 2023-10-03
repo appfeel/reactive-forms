@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
@@ -22,19 +23,23 @@ function _find(
     path: Array<string | number> | string,
     delimiter: string,
 ) {
-    if (path == null) return null;
+    let mPath = path;
 
-    if (!Array.isArray(path)) {
-        path = path.split(delimiter);
+    if (mPath == null) {
+        return null;
     }
-    if (Array.isArray(path) && path.length === 0) return null;
+
+    if (!Array.isArray(mPath)) {
+        mPath = mPath.split(delimiter);
+    }
+    if (Array.isArray(mPath) && mPath.length === 0) return null;
 
     // Not using Array.reduce here due to a Chrome 80 bug
     // https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
     let controlToFind: AbstractControl | null = control;
-    path.forEach((name: string | number) => {
+    mPath.forEach((name: string | number) => {
         if (controlToFind instanceof FormGroup) {
-            controlToFind = controlToFind.controls.hasOwnProperty(name as string)
+            controlToFind = Object.prototype.hasOwnProperty.call(controlToFind.controls, name as string)
                 ? controlToFind.controls[name]
                 : null;
         } else if (controlToFind instanceof FormArray) {
@@ -269,7 +274,8 @@ export abstract class AbstractControl {
     }
 
     set validator(validatorFn: ValidatorFn | null) {
-        this._rawValidators = this._composedValidatorFn = validatorFn;
+        this._composedValidatorFn = validatorFn;
+        this._rawValidators = validatorFn;
     }
 
     /**
@@ -280,7 +286,8 @@ export abstract class AbstractControl {
     }
 
     set asyncValidator(asyncValidatorFn: AsyncValidatorFn | null) {
-        this._rawAsyncValidators = this._composedAsyncValidatorFn = asyncValidatorFn;
+        this._composedAsyncValidatorFn = asyncValidatorFn;
+        this._rawAsyncValidators = asyncValidatorFn;
     }
 
     /**
@@ -1261,7 +1268,8 @@ export class FormControl extends AbstractControl {
         value: any,
         options: ISetFormControlValueOptions = {},
     ): void {
-        (this as { value: any }).value = this._pendingValue = value;
+        this._pendingValue = value;
+        (this as { value: any }).value = value;
         try {
             const htmlElement = this.getHtmlElement() as HTMLInputElement;
             htmlElement.value = value;
@@ -1319,6 +1327,7 @@ export class FormControl extends AbstractControl {
     /**
      * @internal
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _anyControls(_condition: (control: AbstractControl) => boolean): boolean {
         return false;
     }
@@ -1360,6 +1369,7 @@ export class FormControl extends AbstractControl {
     /**
      * @internal
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _forEachChild(_cb: (control: AbstractControl, name: string) => void): void { }
 
     /** @internal */
@@ -1380,14 +1390,16 @@ export class FormControl extends AbstractControl {
 
     private _applyFormState(formState: any) {
         if (this._isBoxedValue(formState)) {
-            (this as { value: any }).value = this._pendingValue = formState.value;
+            this._pendingValue = formState.value;
+            (this as { value: any }).value = formState.value;
             if (formState.disabled) {
                 this.disable({ onlySelf: true, emitEvent: false });
             } else {
                 this.enable({ onlySelf: true, emitEvent: false });
             }
         } else {
-            (this as { value: any }).value = this._pendingValue = formState;
+            this._pendingValue = formState;
+            (this as { value: any }).value = formState;
         }
     }
 }
@@ -1572,7 +1584,7 @@ export class FormGroup extends AbstractControl {
      */
     contains(controlName: string): boolean {
         return (
-            this.controls.hasOwnProperty(controlName)
+            Object.prototype.hasOwnProperty.call(this.controls, controlName)
             && this.controls[controlName].enabled
         );
     }
