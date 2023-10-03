@@ -439,7 +439,7 @@ export abstract class AbstractControl {
      */
     // TODO(issue/24571): remove '!'.
     // public readonly statusChanges!: Observable<any>; // public readonly statusChanges!: EventEmitter<any> | Observable<any>;
-    public readonly statusChanges!: Subject<any>;
+    public readonly statusChanges!: Subject<ReactiveFormStatus>;
 
     /**
      * Reports the update strategy of the `AbstractControl` (meaning
