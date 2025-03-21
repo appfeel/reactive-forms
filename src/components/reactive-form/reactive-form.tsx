@@ -1,4 +1,4 @@
-import { Component, Host, h, Element, EventEmitter, Event, Prop, Watch } from '@stencil/core';
+import { Component, h, Element, EventEmitter, Event, Prop, Watch } from '@stencil/core';
 import { Subscription } from 'rxjs';
 
 import { Debouncer } from '../../utils/debouncer';
@@ -8,7 +8,7 @@ import { ISetFormControlValueOptions, ReactiveFormStatus } from '../../utils/typ
 @Component({
     tag: 'reactive-form',
     styleUrl: 'reactive-form.css',
-    shadow: false,
+    shadow: true,
 })
 export class ReactiveForm {
     @Prop() dataFormGroup!: FormGroup;
@@ -286,10 +286,6 @@ export class ReactiveForm {
     }
 
     render() {
-        return (
-            <Host>
-                <slot />
-            </Host>
-        );
+        return <slot />;
     }
 }
