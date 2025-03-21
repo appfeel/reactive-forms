@@ -8,7 +8,7 @@ import { ISetFormControlValueOptions, ReactiveFormStatus } from '../../utils/typ
 @Component({
     tag: 'reactive-form',
     styleUrl: 'reactive-form.css',
-    shadow: true,
+    shadow: false,
 })
 export class ReactiveForm {
     @Prop() dataFormGroup!: FormGroup;
