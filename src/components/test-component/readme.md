@@ -75,7 +75,6 @@ graph TD;
   test-component --> ion-col
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
-  ion-item --> ion-note
   ion-chip --> ion-ripple-effect
   ion-card --> ion-ripple-effect
   ion-input --> ion-icon
@@ -83,6 +82,8 @@ graph TD;
   ion-select --> ion-popover
   ion-select --> ion-action-sheet
   ion-select --> ion-alert
+  ion-select --> ion-select-modal
+  ion-select --> ion-modal
   ion-select --> ion-icon
   ion-select-popover --> ion-item
   ion-select-popover --> ion-checkbox
@@ -97,8 +98,20 @@ graph TD;
   ion-action-sheet --> ion-ripple-effect
   ion-alert --> ion-ripple-effect
   ion-alert --> ion-backdrop
-  ion-toggle --> ion-icon
+  ion-select-modal --> ion-radio-group
+  ion-select-modal --> ion-item
+  ion-select-modal --> ion-radio
+  ion-select-modal --> ion-checkbox
+  ion-select-modal --> ion-header
+  ion-select-modal --> ion-toolbar
+  ion-select-modal --> ion-title
+  ion-select-modal --> ion-buttons
+  ion-select-modal --> ion-button
+  ion-select-modal --> ion-content
+  ion-select-modal --> ion-list
   ion-button --> ion-ripple-effect
+  ion-modal --> ion-backdrop
+  ion-toggle --> ion-icon
   style test-component fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

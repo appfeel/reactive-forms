@@ -1,6 +1,6 @@
 {
     "name": "forms-reactive",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "description": "Reactive Form Web Component",
     "main": "dist/index.cjs.js",
     "module": "dist/index.js",
@@ -51,12 +51,12 @@
     },
     "license": "MIT",
     "dependencies": {
-        "@stencil/core": "^4.2.0",
+        "@stencil/core": "4.24",
         "dotenv-cli": "^7.3.0",
         "rxjs": "^6.6.3"
     },
     "devDependencies": {
-        "@ionic/core": "^7.3.3",
+        "@ionic/core": "^8.0.0",
         "@types/node": "^20.5.9",
         "eslint": "^8.43.0",
         "eslint-config-airbnb": "^19.0.4",
